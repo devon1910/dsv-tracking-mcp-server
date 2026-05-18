@@ -1,0 +1,118 @@
+{
+    "sttNumber": "SEGOT620304613",
+    "references": {
+        "shipper": [
+            "2033390"
+        ],
+        "consignee": [
+            "29759"
+        ],
+        "waybillAndConsignementNumbers": [
+            "3476472018"
+        ],
+        "additionalReferences": [],
+        "originalStt": null
+    },
+    "goods": {
+        "pieces": 1,
+        "volume": {
+            "value": 0.08,
+            "unit": "CBM"
+        },
+        "weight": {
+            "value": 4.0,
+            "unit": "KGS"
+        },
+        "dimensions": [],
+        "loadingMeters": {
+            "value": 0.0,
+            "unit": "MTR"
+        },
+        "stackable": null,
+        "chargeableWeight": null,
+        "agreementDangerousRoad": null,
+        "customsDuty": null
+    },
+    "events": [
+        {
+            "code": "ENT",
+            "date": "2026-05-16T11:38:00Z",
+            "createdAt": "2026-05-16T11:38:00Z",
+            "location": {
+                "name": "Göteborg",
+                "code": "GOT",
+                "countryCode": "SE"
+            },
+            "comment": "Booked",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        }
+    ],
+    "combiterms": null,
+    "packages": [
+        {
+            "id": "573313432229223401",
+            "events": []
+        }
+    ],
+    "product": "DSVparcel",
+    "service": null,
+    "services": [],
+    "deliveryDate": {
+        "estimated": null,
+        "agreed": null
+    },
+    "transportMode": "LAND",
+    "progressBar": {
+        "steps": [
+            "BOOKED",
+            "TRANSPORTATION",
+            "DISPATCHING_CENTER",
+            "IN_DELIVERY",
+            "DELIVERED"
+        ],
+        "activeStep": "BOOKED"
+    },
+    "location": {
+        "collectFrom": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Kungälv",
+            "postCode": "44240"
+        },
+        "deliverTo": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Fjärås",
+            "postCode": "43974"
+        },
+        "shipperPlace": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Kungälv",
+            "postCode": "44240"
+        },
+        "consigneePlace": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Fjärås",
+            "postCode": "43974"
+        },
+        "dispatchingOffice": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Göteborg"
+        },
+        "receivingOffice": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Göteborg"
+        }
+    },
+    "transportUnits": null,
+    "isXpress": false,
+    "shipmentId": "LandStt:SEGOT620304613:CTTS:LAND",
+    "dataProvider": "CTTS",
+    "percentageProgress": 16
+}

@@ -1,0 +1,118 @@
+{
+    "sttNumber": "SESTO620298048",
+    "references": {
+        "shipper": [
+            "KB212812 / 73549"
+        ],
+        "consignee": [
+            "73549"
+        ],
+        "waybillAndConsignementNumbers": [
+            "3476265230"
+        ],
+        "additionalReferences": [],
+        "originalStt": null
+    },
+    "goods": {
+        "pieces": 1,
+        "volume": {
+            "value": 0.05,
+            "unit": "CBM"
+        },
+        "weight": {
+            "value": 8.0,
+            "unit": "KGS"
+        },
+        "dimensions": [],
+        "loadingMeters": {
+            "value": 0.0,
+            "unit": "MTR"
+        },
+        "stackable": null,
+        "chargeableWeight": null,
+        "agreementDangerousRoad": null,
+        "customsDuty": null
+    },
+    "events": [
+        {
+            "code": "ENT",
+            "date": "2026-05-15T15:44:00Z",
+            "createdAt": "2026-05-15T15:44:00Z",
+            "location": {
+                "name": "Stockholm",
+                "code": "STO",
+                "countryCode": "SE"
+            },
+            "comment": "Booked",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        }
+    ],
+    "combiterms": null,
+    "packages": [
+        {
+            "id": "573313432229014399",
+            "events": []
+        }
+    ],
+    "product": "DSVparcel",
+    "service": null,
+    "services": [],
+    "deliveryDate": {
+        "estimated": null,
+        "agreed": null
+    },
+    "transportMode": "LAND",
+    "progressBar": {
+        "steps": [
+            "BOOKED",
+            "TRANSPORTATION",
+            "DISPATCHING_CENTER",
+            "IN_DELIVERY",
+            "DELIVERED"
+        ],
+        "activeStep": "BOOKED"
+    },
+    "location": {
+        "collectFrom": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Järfälla",
+            "postCode": "17562"
+        },
+        "deliverTo": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Hudiksvall",
+            "postCode": "82455"
+        },
+        "shipperPlace": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Järfälla",
+            "postCode": "17562"
+        },
+        "consigneePlace": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Hudiksvall",
+            "postCode": "82450"
+        },
+        "dispatchingOffice": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Stockholm"
+        },
+        "receivingOffice": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Hudiksvall"
+        }
+    },
+    "transportUnits": null,
+    "isXpress": false,
+    "shipmentId": "LandStt:SESTO620298048:CTTS:LAND",
+    "dataProvider": "CTTS",
+    "percentageProgress": 16
+}

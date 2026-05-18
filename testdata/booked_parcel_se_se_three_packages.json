@@ -1,0 +1,126 @@
+{
+    "sttNumber": "SESTO620298049",
+    "references": {
+        "shipper": [
+            "KB213156 / 43323"
+        ],
+        "consignee": [
+            "43323"
+        ],
+        "waybillAndConsignementNumbers": [
+            "3476265248"
+        ],
+        "additionalReferences": [],
+        "originalStt": null
+    },
+    "goods": {
+        "pieces": 3,
+        "volume": {
+            "value": 0.15,
+            "unit": "CBM"
+        },
+        "weight": {
+            "value": 31.0,
+            "unit": "KGS"
+        },
+        "dimensions": [],
+        "loadingMeters": {
+            "value": 0.0,
+            "unit": "MTR"
+        },
+        "stackable": null,
+        "chargeableWeight": null,
+        "agreementDangerousRoad": null,
+        "customsDuty": null
+    },
+    "events": [
+        {
+            "code": "ENT",
+            "date": "2026-05-15T15:44:00Z",
+            "createdAt": "2026-05-15T15:44:00Z",
+            "location": {
+                "name": "Stockholm",
+                "code": "STO",
+                "countryCode": "SE"
+            },
+            "comment": "Booked",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        }
+    ],
+    "combiterms": null,
+    "packages": [
+        {
+            "id": "573313432229014382",
+            "events": []
+        },
+        {
+            "id": "573313432229014405",
+            "events": []
+        },
+        {
+            "id": "573313432229014412",
+            "events": []
+        }
+    ],
+    "product": "DSVparcel",
+    "service": null,
+    "services": [],
+    "deliveryDate": {
+        "estimated": null,
+        "agreed": null
+    },
+    "transportMode": "LAND",
+    "progressBar": {
+        "steps": [
+            "BOOKED",
+            "TRANSPORTATION",
+            "DISPATCHING_CENTER",
+            "IN_DELIVERY",
+            "DELIVERED"
+        ],
+        "activeStep": "BOOKED"
+    },
+    "location": {
+        "collectFrom": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Järfälla",
+            "postCode": "17562"
+        },
+        "deliverTo": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Upplands väsby",
+            "postCode": "19492"
+        },
+        "shipperPlace": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Järfälla",
+            "postCode": "17562"
+        },
+        "consigneePlace": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Upplands väsby",
+            "postCode": "19492"
+        },
+        "dispatchingOffice": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Stockholm"
+        },
+        "receivingOffice": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Stockholm"
+        }
+    },
+    "transportUnits": null,
+    "isXpress": false,
+    "shipmentId": "LandStt:SESTO620298049:CTTS:LAND",
+    "dataProvider": "CTTS",
+    "percentageProgress": 16
+}

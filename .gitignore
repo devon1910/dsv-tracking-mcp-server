@@ -1,0 +1,21 @@
+# binaries
+dsv-tracking-mcp-server
+*.exe
+
+# dependencies
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# environment
+.env
+.env.*
+!.env.example

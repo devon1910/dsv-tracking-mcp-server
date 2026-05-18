@@ -1,0 +1,371 @@
+{
+    "sttNumber": "VAN5022058",
+    "references": {
+        "shipper": [
+            "J11709 / J11709"
+        ],
+        "consignee": [
+            "8156735"
+        ],
+        "waybillAndConsignementNumbers": [
+            "1806290829",
+            "03368220"
+        ],
+        "additionalReferences": [],
+        "originalStt": null
+    },
+    "goods": {
+        "pieces": 2,
+        "volume": {
+            "value": 5.28,
+            "unit": "CBM"
+        },
+        "weight": {
+            "value": 800.0,
+            "unit": "KGS"
+        },
+        "dimensions": [],
+        "loadingMeters": {
+            "value": 1.4,
+            "unit": "MTR"
+        },
+        "stackable": null,
+        "chargeableWeight": null,
+        "agreementDangerousRoad": null,
+        "customsDuty": null
+    },
+    "events": [
+        {
+            "code": "ENT",
+            "date": "2025-12-11T07:22:00Z",
+            "createdAt": "2025-12-11T07:22:00Z",
+            "location": {
+                "name": "Vänersborg",
+                "code": "VAN",
+                "countryCode": "SE"
+            },
+            "comment": "Booked",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        },
+        {
+            "code": "COL",
+            "date": "2025-12-11T14:50:00Z",
+            "createdAt": "2025-12-11T14:50:00Z",
+            "location": {
+                "name": "Sjuntorp",
+                "code": "VAN",
+                "countryCode": "SE"
+            },
+            "comment": "Collected",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        },
+        {
+            "code": "ENM",
+            "date": "2025-12-11T22:00:00Z",
+            "createdAt": "2025-12-11T22:00:00Z",
+            "location": {
+                "name": "Värnamo",
+                "code": "VMO",
+                "countryCode": "SE"
+            },
+            "comment": "Arrived",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        },
+        {
+            "code": "ENM",
+            "date": "2025-12-11T23:47:00Z",
+            "createdAt": "2025-12-11T23:47:00Z",
+            "location": {
+                "name": "Värnamo",
+                "code": "VMO",
+                "countryCode": "SE"
+            },
+            "comment": "Arrived",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        },
+        {
+            "code": "MAN",
+            "date": "2025-12-15T23:24:00Z",
+            "createdAt": "2025-12-15T23:24:00Z",
+            "location": {
+                "name": "Värnamo",
+                "code": "VMO",
+                "countryCode": "SE"
+            },
+            "comment": "Departed",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        },
+        {
+            "code": "ENM",
+            "date": "2025-12-17T08:31:00Z",
+            "createdAt": "2025-12-17T08:31:00Z",
+            "location": {
+                "name": "Serris",
+                "code": "SXR",
+                "countryCode": "FR"
+            },
+            "comment": "Arrived",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        },
+        {
+            "code": "MAN",
+            "date": "2025-12-17T21:00:00Z",
+            "createdAt": "2025-12-17T21:00:00Z",
+            "location": {
+                "name": "Serris",
+                "code": "SXR",
+                "countryCode": "FR"
+            },
+            "comment": "Departed",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        },
+        {
+            "code": "ENM",
+            "date": "2025-12-18T04:30:00Z",
+            "createdAt": "2025-12-18T04:30:00Z",
+            "location": {
+                "name": "Saint-Omer",
+                "code": "SOM",
+                "countryCode": "FR"
+            },
+            "comment": "Arrived",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        },
+        {
+            "code": "DOT",
+            "date": "2025-12-18T07:20:00Z",
+            "createdAt": "2025-12-18T07:20:00Z",
+            "location": {
+                "name": "Saint-Omer",
+                "code": "SOM",
+                "countryCode": "FR"
+            },
+            "comment": "Out for Delivery",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        },
+        {
+            "code": "DLV",
+            "date": "2025-12-18T10:11:00Z",
+            "createdAt": "2025-12-18T10:11:00Z",
+            "location": {
+                "name": "Dourges",
+                "code": "SOM",
+                "countryCode": "FR"
+            },
+            "comment": "Delivered",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        }
+    ],
+    "combiterms": "Delivered buyer's premises Duty Unpaid",
+    "packages": [
+        {
+            "id": "573313432170044780",
+            "events": [
+                {
+                    "code": "ENM",
+                    "countryCode": "SE",
+                    "location": "Värnamo",
+                    "date": "2025-12-11T23:47:00Z"
+                },
+                {
+                    "code": "NLO",
+                    "countryCode": "SE",
+                    "location": "Värnamo",
+                    "date": "2025-12-12T05:55:00Z"
+                },
+                {
+                    "code": "MAN",
+                    "countryCode": "SE",
+                    "location": "Värnamo",
+                    "date": "2025-12-15T23:24:00Z"
+                },
+                {
+                    "code": "ENM",
+                    "countryCode": "FR",
+                    "location": "Serris",
+                    "date": "2025-12-17T08:31:00Z"
+                },
+                {
+                    "code": "ENM",
+                    "countryCode": "FR",
+                    "location": "Serris",
+                    "date": "2025-12-17T08:31:00Z"
+                },
+                {
+                    "code": "ENM",
+                    "countryCode": "FR",
+                    "location": "Serris",
+                    "date": "2025-12-17T09:33:00Z"
+                },
+                {
+                    "code": "MAN",
+                    "countryCode": "FR",
+                    "location": "Serris",
+                    "date": "2025-12-17T15:53:00Z"
+                },
+                {
+                    "code": "ENM",
+                    "countryCode": "FR",
+                    "location": "Saint-Omer",
+                    "date": "2025-12-18T04:24:00Z"
+                },
+                {
+                    "code": "DOT",
+                    "countryCode": "FR",
+                    "location": "Saint-Omer",
+                    "date": "2025-12-18T06:05:00Z"
+                },
+                {
+                    "code": "DLV",
+                    "countryCode": "FR",
+                    "location": "Dourges",
+                    "date": "2025-12-18T10:11:00Z"
+                }
+            ]
+        },
+        {
+            "id": "573313432170044797",
+            "events": [
+                {
+                    "code": "ENM",
+                    "countryCode": "SE",
+                    "location": "Värnamo",
+                    "date": "2025-12-11T23:47:00Z"
+                },
+                {
+                    "code": "NLO",
+                    "countryCode": "SE",
+                    "location": "Värnamo",
+                    "date": "2025-12-12T05:55:00Z"
+                },
+                {
+                    "code": "MAN",
+                    "countryCode": "SE",
+                    "location": "Värnamo",
+                    "date": "2025-12-15T23:24:00Z"
+                },
+                {
+                    "code": "ENM",
+                    "countryCode": "FR",
+                    "location": "Serris",
+                    "date": "2025-12-17T08:31:00Z"
+                },
+                {
+                    "code": "ENM",
+                    "countryCode": "FR",
+                    "location": "Serris",
+                    "date": "2025-12-17T08:31:00Z"
+                },
+                {
+                    "code": "ENM",
+                    "countryCode": "FR",
+                    "location": "Serris",
+                    "date": "2025-12-17T09:29:00Z"
+                },
+                {
+                    "code": "MAN",
+                    "countryCode": "FR",
+                    "location": "Serris",
+                    "date": "2025-12-17T15:50:00Z"
+                },
+                {
+                    "code": "ENM",
+                    "countryCode": "FR",
+                    "location": "Saint-Omer",
+                    "date": "2025-12-18T04:30:00Z"
+                },
+                {
+                    "code": "DOT",
+                    "countryCode": "FR",
+                    "location": "Saint-Omer",
+                    "date": "2025-12-18T06:32:00Z"
+                },
+                {
+                    "code": "DLV",
+                    "countryCode": "FR",
+                    "location": "Dourges",
+                    "date": "2025-12-18T09:09:00Z"
+                }
+            ]
+        }
+    ],
+    "product": "DSV LTL",
+    "service": null,
+    "services": [],
+    "deliveryDate": {
+        "estimated": "2025-12-18T00:00:00Z",
+        "agreed": null
+    },
+    "transportMode": "LAND",
+    "progressBar": {
+        "steps": [
+            "BOOKED",
+            "TRANSPORTATION",
+            "DISPATCHING_CENTER",
+            "IN_DELIVERY",
+            "DELIVERED"
+        ],
+        "activeStep": "DELIVERED"
+    },
+    "location": {
+        "collectFrom": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Sjuntorp",
+            "postCode": "46178"
+        },
+        "deliverTo": {
+            "countryCode": "FR",
+            "country": "France",
+            "city": "Dourges",
+            "postCode": "62119"
+        },
+        "shipperPlace": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Sjuntorp",
+            "postCode": "46178"
+        },
+        "consigneePlace": {
+            "countryCode": "FR",
+            "country": "France",
+            "city": "Dourges",
+            "postCode": "62119"
+        },
+        "dispatchingOffice": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Vänersborg"
+        },
+        "receivingOffice": {
+            "countryCode": "FR",
+            "country": "France",
+            "city": "Saint-Omer"
+        }
+    },
+    "transportUnits": null,
+    "isXpress": false,
+    "shipmentId": "LandStt:VAN5022058:CTTS:LAND",
+    "dataProvider": "CTTS",
+    "percentageProgress": 100
+}

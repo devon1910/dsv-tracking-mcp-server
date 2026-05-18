@@ -1,0 +1,211 @@
+{
+    "sttNumber": "SESTO620296604",
+    "references": {
+        "shipper": [
+            "KB214567 / 10667"
+        ],
+        "consignee": [],
+        "waybillAndConsignementNumbers": [
+            "3476186295"
+        ],
+        "additionalReferences": [],
+        "originalStt": null
+    },
+    "goods": {
+        "pieces": 1,
+        "volume": {
+            "value": 0.007,
+            "unit": "CBM"
+        },
+        "weight": {
+            "value": 0.6,
+            "unit": "KGS"
+        },
+        "dimensions": [],
+        "loadingMeters": {
+            "value": 0.0,
+            "unit": "MTR"
+        },
+        "stackable": null,
+        "chargeableWeight": null,
+        "agreementDangerousRoad": null,
+        "customsDuty": null
+    },
+    "events": [
+        {
+            "code": "ENT",
+            "date": "2026-05-15T13:12:00Z",
+            "createdAt": "2026-05-15T13:12:00Z",
+            "location": {
+                "name": "Stockholm",
+                "code": "STO",
+                "countryCode": "SE"
+            },
+            "comment": "Booked",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        },
+        {
+            "code": "COL",
+            "date": "2026-05-15T14:00:00Z",
+            "createdAt": "2026-05-15T14:00:00Z",
+            "location": {
+                "name": "Järfälla",
+                "code": "STO",
+                "countryCode": "SE"
+            },
+            "comment": "Collected",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        },
+        {
+            "code": "ENM",
+            "date": "2026-05-15T14:01:00Z",
+            "createdAt": "2026-05-15T14:01:00Z",
+            "location": {
+                "name": "Stockholm",
+                "code": "STO",
+                "countryCode": "SE"
+            },
+            "comment": "Arrived",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        },
+        {
+            "code": "MAN",
+            "date": "2026-05-15T15:51:00Z",
+            "createdAt": "2026-05-15T15:51:00Z",
+            "location": {
+                "name": "Stockholm",
+                "code": "STO",
+                "countryCode": "SE"
+            },
+            "comment": "Departed",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        },
+        {
+            "code": "ENM",
+            "date": "2026-05-18T01:39:00Z",
+            "createdAt": "2026-05-18T01:39:00Z",
+            "location": {
+                "name": "Skara",
+                "code": "SKA",
+                "countryCode": "SE"
+            },
+            "comment": "Arrived",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        },
+        {
+            "code": "DOT",
+            "date": "2026-05-18T06:54:00Z",
+            "createdAt": "2026-05-18T06:54:00Z",
+            "location": {
+                "name": "Skara",
+                "code": "SKA",
+                "countryCode": "SE"
+            },
+            "comment": "Out for Delivery",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        }
+    ],
+    "combiterms": null,
+    "packages": [
+        {
+            "id": "573313432228927539",
+            "events": [
+                {
+                    "code": "COL",
+                    "countryCode": "SE",
+                    "location": "Järfälla",
+                    "date": "2026-05-15T14:00:00Z"
+                },
+                {
+                    "code": "ENM",
+                    "countryCode": "SE",
+                    "location": "Stockholm",
+                    "date": "2026-05-15T14:01:00Z"
+                },
+                {
+                    "code": "MAN",
+                    "countryCode": "SE",
+                    "location": "Stockholm",
+                    "date": "2026-05-15T15:51:00Z"
+                },
+                {
+                    "code": "ENM",
+                    "countryCode": "SE",
+                    "location": "Skara",
+                    "date": "2026-05-18T01:39:00Z"
+                }
+            ]
+        }
+    ],
+    "product": "DSVparcel",
+    "service": null,
+    "services": [],
+    "deliveryDate": {
+        "estimated": "2026-05-18T00:00:00Z",
+        "agreed": null
+    },
+    "transportMode": "LAND",
+    "progressBar": {
+        "steps": [
+            "BOOKED",
+            "TRANSPORTATION",
+            "DISPATCHING_CENTER",
+            "IN_DELIVERY",
+            "DELIVERED"
+        ],
+        "activeStep": "IN_DELIVERY"
+    },
+    "location": {
+        "collectFrom": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Järfälla",
+            "postCode": "17562"
+        },
+        "deliverTo": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Floby",
+            "postCode": "52151"
+        },
+        "shipperPlace": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Järfälla",
+            "postCode": "17562"
+        },
+        "consigneePlace": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Floby",
+            "postCode": "52151"
+        },
+        "dispatchingOffice": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Stockholm"
+        },
+        "receivingOffice": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Skara"
+        }
+    },
+    "transportUnits": null,
+    "isXpress": false,
+    "shipmentId": "LandStt:SESTO620296604:CTTS:LAND",
+    "dataProvider": "CTTS",
+    "percentageProgress": 83
+}

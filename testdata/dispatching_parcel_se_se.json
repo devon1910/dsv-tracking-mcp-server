@@ -1,0 +1,214 @@
+{
+    "sttNumber": "SEKSD620143489",
+    "references": {
+        "shipper": [],
+        "consignee": [],
+        "waybillAndConsignementNumbers": [
+            "3476257542"
+        ],
+        "additionalReferences": [],
+        "originalStt": null
+    },
+    "goods": {
+        "pieces": 1,
+        "volume": {
+            "value": 0.038,
+            "unit": "CBM"
+        },
+        "weight": {
+            "value": 3.7,
+            "unit": "KGS"
+        },
+        "dimensions": [],
+        "loadingMeters": {
+            "value": 0.0,
+            "unit": "MTR"
+        },
+        "stackable": null,
+        "chargeableWeight": null,
+        "agreementDangerousRoad": null,
+        "customsDuty": null
+    },
+    "events": [
+        {
+            "code": "COL",
+            "date": "2026-05-15T14:00:00Z",
+            "createdAt": "2026-05-15T14:00:00Z",
+            "location": {
+                "name": "Karlstad",
+                "code": "KSD",
+                "countryCode": "SE"
+            },
+            "comment": "Collected",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        },
+        {
+            "code": "ENM",
+            "date": "2026-05-15T14:01:00Z",
+            "createdAt": "2026-05-15T14:01:00Z",
+            "location": {
+                "name": "Karlstad",
+                "code": "KSD",
+                "countryCode": "SE"
+            },
+            "comment": "Arrived",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        },
+        {
+            "code": "ENT",
+            "date": "2026-05-15T15:24:00Z",
+            "createdAt": "2026-05-15T15:24:00Z",
+            "location": {
+                "name": "Karlstad",
+                "code": "KSD",
+                "countryCode": "SE"
+            },
+            "comment": "Booked",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        },
+        {
+            "code": "MAN",
+            "date": "2026-05-15T16:15:00Z",
+            "createdAt": "2026-05-15T16:15:00Z",
+            "location": {
+                "name": "Karlstad",
+                "code": "KSD",
+                "countryCode": "SE"
+            },
+            "comment": "Departed",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        },
+        {
+            "code": "DIS",
+            "date": "2026-05-15T16:20:00Z",
+            "createdAt": "2026-05-15T16:20:00Z",
+            "location": {
+                "name": "Karlstad",
+                "code": "KSD",
+                "countryCode": "SE"
+            },
+            "comment": "To Consignee's Disposal",
+            "recipient": null,
+            "reasons": [
+                {
+                    "code": "PA",
+                    "description": "Pre-advice initiated"
+                }
+            ],
+            "shellIconName": null
+        },
+        {
+            "code": "ENM",
+            "date": "2026-05-18T04:40:00Z",
+            "createdAt": "2026-05-18T04:40:00Z",
+            "location": {
+                "name": "Karlstad",
+                "code": "KSD",
+                "countryCode": "SE"
+            },
+            "comment": "Arrived",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        }
+    ],
+    "combiterms": null,
+    "packages": [
+        {
+            "id": "573313432229005939",
+            "events": [
+                {
+                    "code": "COL",
+                    "countryCode": "SE",
+                    "location": "Karlstad",
+                    "date": "2026-05-15T14:00:00Z"
+                },
+                {
+                    "code": "ENM",
+                    "countryCode": "SE",
+                    "location": "Karlstad",
+                    "date": "2026-05-15T14:01:00Z"
+                },
+                {
+                    "code": "MAN",
+                    "countryCode": "SE",
+                    "location": "Karlstad",
+                    "date": "2026-05-15T16:15:00Z"
+                },
+                {
+                    "code": "ENM",
+                    "countryCode": "SE",
+                    "location": "Karlstad",
+                    "date": "2026-05-18T04:40:00Z"
+                }
+            ]
+        }
+    ],
+    "product": "DSVparcel",
+    "service": null,
+    "services": [],
+    "deliveryDate": {
+        "estimated": "2026-05-20T00:00:00Z",
+        "agreed": null
+    },
+    "transportMode": "LAND",
+    "progressBar": {
+        "steps": [
+            "BOOKED",
+            "TRANSPORTATION",
+            "DISPATCHING_CENTER",
+            "IN_DELIVERY",
+            "DELIVERED"
+        ],
+        "activeStep": "DISPATCHING_CENTER"
+    },
+    "location": {
+        "collectFrom": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Karlstad",
+            "postCode": "65221"
+        },
+        "deliverTo": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Arvika",
+            "postCode": "67191"
+        },
+        "shipperPlace": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Karlstad",
+            "postCode": "65221"
+        },
+        "consigneePlace": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Arvika",
+            "postCode": "67191"
+        },
+        "dispatchingOffice": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Karlstad"
+        },
+        "receivingOffice": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Karlstad"
+        }
+    },
+    "transportUnits": null,
+    "isXpress": false,
+    "shipmentId": "LandStt:SEKSD620143489:CTTS:LAND",
+    "dataProvider": "CTTS",
+    "percentageProgress": 66
+}

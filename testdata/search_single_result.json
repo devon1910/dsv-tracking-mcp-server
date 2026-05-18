@@ -1,0 +1,20 @@
+{
+    "result": [
+        {
+            "id": "LandStt:LKG6022524:CTTS:LAND",
+            "stt": "LKG6022524",
+            "transportMode": "LAND",
+            "percentageProgress": 16,
+            "lastEventCode": "ENT",
+            "fromLocation": "Linköping",
+            "toLocation": "Skive",
+            "startDate": "2026-05-15T00:00:00Z",
+            "endDate": null,
+            "consignment": null,
+            "additionalReferenceValues": null,
+            "isXpress": false,
+            "swedenViewAvailable": true
+        }
+    ],
+    "warnings": []
+}

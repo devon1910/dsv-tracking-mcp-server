@@ -1,0 +1,122 @@
+{
+    "sttNumber": "LKG6022524",
+    "references": {
+        "shipper": [],
+        "consignee": [],
+        "waybillAndConsignementNumbers": [
+            "3476238161"
+        ],
+        "additionalReferences": [],
+        "originalStt": null
+    },
+    "goods": {
+        "pieces": 3,
+        "volume": {
+            "value": 15.396,
+            "unit": "CBM"
+        },
+        "weight": {
+            "value": 5434.0,
+            "unit": "KGS"
+        },
+        "dimensions": [],
+        "loadingMeters": {
+            "value": 3.9,
+            "unit": "MTR"
+        },
+        "stackable": null,
+        "chargeableWeight": null,
+        "agreementDangerousRoad": null,
+        "customsDuty": null
+    },
+    "events": [
+        {
+            "code": "ENT",
+            "date": "2026-05-15T15:32:00Z",
+            "createdAt": "2026-05-15T15:32:00Z",
+            "location": {
+                "name": "Linköping",
+                "code": "LKG",
+                "countryCode": "SE"
+            },
+            "comment": "Booked",
+            "recipient": null,
+            "reasons": [],
+            "shellIconName": null
+        }
+    ],
+    "combiterms": "Delivered buyer's premises Duty Unpaid",
+    "packages": [
+        {
+            "id": "573313432228984471",
+            "events": []
+        },
+        {
+            "id": "573313432228984488",
+            "events": []
+        },
+        {
+            "id": "573313432228984495",
+            "events": []
+        }
+    ],
+    "product": "DSV LTL",
+    "service": null,
+    "services": [],
+    "deliveryDate": {
+        "estimated": null,
+        "agreed": null
+    },
+    "transportMode": "LAND",
+    "progressBar": {
+        "steps": [
+            "BOOKED",
+            "TRANSPORTATION",
+            "DISPATCHING_CENTER",
+            "IN_DELIVERY",
+            "DELIVERED"
+        ],
+        "activeStep": "BOOKED"
+    },
+    "location": {
+        "collectFrom": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Linköping",
+            "postCode": "58941"
+        },
+        "deliverTo": {
+            "countryCode": "DK",
+            "country": "Denmark",
+            "city": "Skive",
+            "postCode": "7800"
+        },
+        "shipperPlace": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Linköping",
+            "postCode": "58941"
+        },
+        "consigneePlace": {
+            "countryCode": "DK",
+            "country": "Denmark",
+            "city": "Skive",
+            "postCode": "7800"
+        },
+        "dispatchingOffice": {
+            "countryCode": "SE",
+            "country": "Sweden",
+            "city": "Linköping"
+        },
+        "receivingOffice": {
+            "countryCode": "DK",
+            "country": "Denmark",
+            "city": "Kolding"
+        }
+    },
+    "transportUnits": null,
+    "isXpress": false,
+    "shipmentId": "LandStt:LKG6022524:CTTS:LAND",
+    "dataProvider": "CTTS",
+    "percentageProgress": 16
+}
