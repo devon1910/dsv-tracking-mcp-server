@@ -143,3 +143,19 @@ type Progress struct {
 	Steps      []ProgressStage
 	ActiveStep ProgressStage
 }
+
+// ShipmentSummary holds the abbreviated data returned by the search endpoint.
+// For the full event history and package detail, fetch by ShipmentID.
+type ShipmentSummary struct {
+	ShipmentID         string
+	STTNumber          string
+	TransportMode      TransportMode
+	PercentageProgress int
+	LastEventCode      EventCode
+	LastEventRawCode   string
+	FromLocation       string
+	ToLocation         string
+	StartDate          *time.Time
+	EndDate            *time.Time
+	IsXpress           bool
+}

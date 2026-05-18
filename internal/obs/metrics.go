@@ -7,15 +7,21 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-// Metrics holds Prometheus counters and histograms for MCP tool calls.
+// Metrics holds Prometheus counters and histograms for the server.
 // Each instance has its own registry; there is no global state.
 type Metrics struct {
+	// MCP tool call metrics.
 	ToolCalls   *prometheus.CounterVec
 	ToolLatency *prometheus.HistogramVec
-	reg         *prometheus.Registry
+
+	// DSV upstream request metrics.
+	DSVRequests *prometheus.CounterVec   // labels: endpoint, status
+	DSVLatency  *prometheus.HistogramVec // labels: endpoint
+
+	reg *prometheus.Registry
 }
 
-// NewMetrics constructs and registers MCP metrics on a fresh Prometheus registry.
+// NewMetrics constructs and registers all metrics on a fresh Prometheus registry.
 func NewMetrics() *Metrics {
 	reg := prometheus.NewRegistry()
 	m := &Metrics{
@@ -29,8 +35,17 @@ func NewMetrics() *Metrics {
 			Help:    "Latency of MCP tool calls in seconds.",
 			Buckets: prometheus.DefBuckets,
 		}, []string{"tool"}),
+		DSVRequests: prometheus.NewCounterVec(prometheus.CounterOpts{
+			Name: "dsv_upstream_requests_total",
+			Help: "Total DSV upstream HTTP requests partitioned by endpoint and HTTP status class.",
+		}, []string{"endpoint", "status"}),
+		DSVLatency: prometheus.NewHistogramVec(prometheus.HistogramOpts{
+			Name:    "dsv_upstream_latency_seconds",
+			Help:    "Latency of DSV upstream HTTP requests in seconds.",
+			Buckets: prometheus.DefBuckets,
+		}, []string{"endpoint"}),
 	}
-	reg.MustRegister(m.ToolCalls, m.ToolLatency)
+	reg.MustRegister(m.ToolCalls, m.ToolLatency, m.DSVRequests, m.DSVLatency)
 	return m
 }
 
