@@ -176,13 +176,17 @@ Based on the 7 detail-endpoint samples.
 
 The `comment` field is user-facing English prose and is **not** a stable API contract. The adapter should maintain its own enum keyed on `code`, with an `Unknown` fallback for codes outside the observed set.
 
+`NLO` was observed only in **package-level** event arrays (`packages[].events`) across all 7 fixtures. The shipment-level `events[]` array never contained `NLO` in observed data, though the type system permits it.
+
 ---
 
 ## Event Array Ordering
 
-The `events[]` array in upstream responses is **not sorted chronologically**. In `dispatching_parcel_se_se.json` (STT `SEKSD620143489`), `COL` fires at 14:00 and `ENM` at 14:01, yet `ENT` (Booked) appears third in the array at 15:24 — the booking record was created after the parcel was already collected and scanned at the hub. This is a real-world operational pattern, not a data error.
+All 7 observed fixtures have their `events[]` arrays sorted by `date` ascending. The upstream's API contract makes no explicit ordering guarantee, however, so this may not hold for all shipments or future responses.
 
-The MCP adapter sorts `events[]` by `date` ascending before returning them to callers. The original upstream array order is not preserved because it reflects system ingestion order rather than physical chronology. Consumers of the MCP tool will always receive events in chronological order.
+The mapper sorts `events[]` defensively before constructing a `Shipment`, ensuring consumers always receive a stable chronological contract regardless of what the upstream delivers.
+
+**Semantic vs. positional ordering:** event positions in observed data reflect ingestion order; `date` timestamps reflect physical event time. In `dispatching_parcel_se_se.json` (STT `SEKSD620143489`) these coincide — `ENT` (Booked, 15:24) sits in array position 3, after `COL` (14:00) and `ENM` (14:01) — but the timestamps tell a semantically surprising story: the booking record was created 84 minutes after the parcel was physically collected. This is a real-world operational pattern (driver scans before booking is entered), not a data error. Consumers must not infer operational sequence from array position.
 
 ---
 
