@@ -1,5 +1,5 @@
 # binaries
-dsv-tracking-mcp-server
+bin/
 *.exe
 
 # dependencies

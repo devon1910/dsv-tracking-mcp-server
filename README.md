@@ -15,7 +15,7 @@ A Model Context Protocol (MCP) server written in Go that wraps DSV's public ship
 
 ## Setup
 
-Requires Go 1.24+. Run `make build` to compile the binary to `bin/dsv-tracking-mcp-server`.
+Requires Go 1.25+. Run `make build` to compile the binary to `bin/dsv-tracking-mcp-server`.
 
 ## Usage
 
