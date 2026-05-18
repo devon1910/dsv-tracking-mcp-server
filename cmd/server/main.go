@@ -11,6 +11,7 @@ import (
 
 	"github.com/devon1910/dsv-tracking-mcp-server/internal/mcp"
 	"github.com/devon1910/dsv-tracking-mcp-server/internal/obs"
+	"github.com/devon1910/dsv-tracking-mcp-server/internal/upstream/dsv"
 )
 
 func main() {
@@ -18,6 +19,13 @@ func main() {
 
 	logger := obs.NewLogger()
 	metrics := obs.NewMetrics()
+
+	dsvClient := dsv.NewClient(dsv.ClientConfig{
+		Logger:  logger,
+		Metrics: metrics,
+	})
+	logger.Info("DSV client constructed", slog.String("base_url", "https://mydsv.dsv.com"))
+	_ = dsvClient // Phase 4 wires this into tool handlers
 
 	mcpSrv := mcp.New(logger, metrics)
 	metricsSrv := obs.MetricsServer(cfg.metricsAddr, metrics)

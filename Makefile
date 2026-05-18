@@ -1,7 +1,7 @@
 BINARY  := bin/dsv-tracking-mcp-server
 CMD     := ./cmd/server
 
-.PHONY: build test lint run clean
+.PHONY: build test test-integration lint run clean
 
 build:
 	go build -o $(BINARY) $(CMD)
@@ -14,6 +14,9 @@ lint:
 
 run: build
 	$(BINARY)
+
+test-integration:
+	go test -race -tags=integration ./...
 
 clean:
 	rm -rf bin/

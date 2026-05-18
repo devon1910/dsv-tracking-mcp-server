@@ -249,7 +249,24 @@ The `code` field is the stable machine-readable contract. The `message` is human
 
 ## Headers and Request Requirements
 
-TBD: confirm whether `Origin`, `Referer`, or other browser-context headers are required by the upstream during the Phase 3 upstream-client implementation.
+**Confirmed in Phase 3:**
+
+**Required headers:** `Accept: application/json` and a non-empty `User-Agent` are sufficient for the server to recognise the request as an API call. No `Origin`, `Referer`, `sec-fetch-*`, or other browser-context headers are required by the routing layer.
+
+**Bot protection (Captcha-Puzzle):** All direct HTTP requests consistently return `429 Too Many Requests` with a `Captcha-Puzzle` response header containing comma-separated HMAC-signed JWTs. Each JWT payload has the form `{"puzzle":"<base64-challenge>","iat":<unix>,"exp":<unix+60s>}`. This is a server-side proof-of-work (PoW) challenge that the browser's JavaScript solver handles transparently. Without solving the puzzle, the API is inaccessible to direct clients regardless of headers.
+
+The golden fixtures in `testdata/` were gathered via a browser session that had already solved the puzzle. For the MCP server to make live requests, one of the following is required:
+- Implement a puzzle solver for the PoW algorithm (not yet reverse-engineered).
+- Hold a browser-solved `INGRESSCOOKIE` session and refresh it as needed.
+- Use official DSV API credentials (if DSV offers an authenticated non-puzzle path for partners).
+
+The client maps 429 responses to `domain.ErrThrottled`. Integration tests document passing a pre-solved cookie via `DSV_INTEGRATION_COOKIE`.
+
+**URL path encoding:** Colons in the composite shipmentID must **not** be percent-encoded. The correct path form is:
+```
+GET /nges-portal/api/public/tracking-public/shipments/land/LandStt:VAN5022058:CTTS:LAND
+```
+Using `%3A` breaks upstream routing. Colons are valid sub-delimiter characters in RFC 3986 path segments, so this is spec-compliant.
 
 ---
 
