@@ -1,4 +1,4 @@
-BINARY := dsv-tracking-mcp-server
+BINARY  := bin/dsv-tracking-mcp-server
 CMD     := ./cmd/server
 
 .PHONY: build test lint run clean
@@ -7,13 +7,13 @@ build:
 	go build -o $(BINARY) $(CMD)
 
 test:
-	go test ./...
+	go test -race ./...
 
 lint:
 	golangci-lint run ./...
 
-run:
-	go run $(CMD)
+run: build
+	$(BINARY)
 
 clean:
-	rm -f $(BINARY)
+	rm -rf bin/
