@@ -4,14 +4,33 @@
   "status": "Booked",
   "transport_mode": "LAND",
   "data_provider": "CTTS",
-  "sender": {
-    "address": "17562 Järfälla",
+  "shipper_place": {
+    "post_code": "17562",
     "city": "Järfälla",
+    "country_code": "SE",
     "country": "Sweden"
   },
-  "receiver": {
-    "address": "82450 Hudiksvall",
+  "consignee_place": {
+    "post_code": "82450",
     "city": "Hudiksvall",
+    "country_code": "SE",
+    "country": "Sweden"
+  },
+  "collect_from": {
+    "post_code": "17562",
+    "city": "Järfälla",
+    "country_code": "SE",
+    "country": "Sweden"
+  },
+  "deliver_to": {
+    "post_code": "82455",
+    "city": "Hudiksvall",
+    "country_code": "SE",
+    "country": "Sweden"
+  },
+  "dispatching_office": {
+    "city": "Stockholm",
+    "country_code": "SE",
     "country": "Sweden"
   },
   "events": [

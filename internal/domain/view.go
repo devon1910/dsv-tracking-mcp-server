@@ -10,10 +10,17 @@ package domain
 // ShipmentSummaryView is returned by the track_shipment tool.
 type ShipmentSummaryView struct {
 	ShipmentID    string `json:"shipment_id"`
+	STT           string `json:"stt"`
 	Reference     string `json:"reference"`
 	Status        string `json:"status"`
+	LastEventCode string `json:"last_event_code"`
 	TransportMode string `json:"transport_mode"`
 	DataProvider  string `json:"data_provider"`
+	Progress      int    `json:"progress"`
+	FromLocation  string `json:"from_location,omitempty"`
+	ToLocation    string `json:"to_location,omitempty"`
+	StartDate     string `json:"start_date,omitempty"`
+	EndDate       string `json:"end_date,omitempty"`
 }
 
 // MeasurementView is a numeric value with its unit.
@@ -40,25 +47,33 @@ type GoodsView struct {
 
 // ShipmentDetailView is returned by the get_shipment_details tool.
 type ShipmentDetailView struct {
-	ShipmentID    string      `json:"shipment_id"`
-	Reference     string      `json:"reference"`
-	Status        string      `json:"status"`
-	TransportMode string      `json:"transport_mode"`
-	DataProvider  string      `json:"data_provider"`
-	Sender        *PartyView  `json:"sender,omitempty"`
-	Receiver      *PartyView  `json:"receiver,omitempty"`
-	Events        []EventView   `json:"events"`
-	Packages      []PackageView `json:"packages"`
-	Goods         *GoodsView    `json:"goods,omitempty"`
-	ViewInUIURL   string        `json:"view_in_ui_url,omitempty"`
+	ShipmentID        string        `json:"shipment_id"`
+	Reference         string        `json:"reference"`
+	Status            string        `json:"status"`
+	TransportMode     string        `json:"transport_mode"`
+	DataProvider      string        `json:"data_provider"`
+	ShipperPlace      *LocationView `json:"shipper_place,omitempty"`
+	ConsigneePlace    *LocationView `json:"consignee_place,omitempty"`
+	CollectFrom       *LocationView `json:"collect_from,omitempty"`
+	DeliverTo         *LocationView `json:"deliver_to,omitempty"`
+	DispatchingOffice *LocationView `json:"dispatching_office,omitempty"`
+	Events            []EventView   `json:"events"`
+	Packages          []PackageView `json:"packages"`
+	Goods             *GoodsView    `json:"goods,omitempty"`
+	ViewInUIURL       string        `json:"view_in_ui_url,omitempty"`
 }
 
-// PartyView represents a sender or receiver.
-//
-// Name is intentionally nullable: DSV's public tracking API exposes addresses
-// but never party names. Party names are only available through authenticated
-// DSV API endpoints that are out of scope for v1. Do not synthesise a name
-// from other fields — leave it nil so callers know the gap is real.
+// LocationView represents a location at postcode/city/country level.
+// DSV's public tracking endpoint does not expose party names or street
+// addresses — only postCode, city, countryCode, and country are available.
+type LocationView struct {
+	PostCode    string `json:"post_code,omitempty"`
+	City        string `json:"city,omitempty"`
+	CountryCode string `json:"country_code,omitempty"`
+	Country     string `json:"country,omitempty"`
+}
+
+// PartyView is kept for backwards-compatibility; no longer used by ShipmentDetailView.
 type PartyView struct {
 	Name    *string `json:"name,omitempty"`
 	Address string  `json:"address,omitempty"`

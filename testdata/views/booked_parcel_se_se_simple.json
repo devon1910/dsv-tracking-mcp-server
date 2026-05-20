@@ -4,14 +4,33 @@
   "status": "Booked",
   "transport_mode": "LAND",
   "data_provider": "CTTS",
-  "sender": {
-    "address": "44240 Kungälv",
+  "shipper_place": {
+    "post_code": "44240",
     "city": "Kungälv",
+    "country_code": "SE",
     "country": "Sweden"
   },
-  "receiver": {
-    "address": "43974 Fjärås",
+  "consignee_place": {
+    "post_code": "43974",
     "city": "Fjärås",
+    "country_code": "SE",
+    "country": "Sweden"
+  },
+  "collect_from": {
+    "post_code": "44240",
+    "city": "Kungälv",
+    "country_code": "SE",
+    "country": "Sweden"
+  },
+  "deliver_to": {
+    "post_code": "43974",
+    "city": "Fjärås",
+    "country_code": "SE",
+    "country": "Sweden"
+  },
+  "dispatching_office": {
+    "city": "Göteborg",
+    "country_code": "SE",
     "country": "Sweden"
   },
   "events": [

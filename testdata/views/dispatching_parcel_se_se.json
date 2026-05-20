@@ -4,14 +4,33 @@
   "status": "At dispatching centre",
   "transport_mode": "LAND",
   "data_provider": "CTTS",
-  "sender": {
-    "address": "65221 Karlstad",
+  "shipper_place": {
+    "post_code": "65221",
     "city": "Karlstad",
+    "country_code": "SE",
     "country": "Sweden"
   },
-  "receiver": {
-    "address": "67191 Arvika",
+  "consignee_place": {
+    "post_code": "67191",
     "city": "Arvika",
+    "country_code": "SE",
+    "country": "Sweden"
+  },
+  "collect_from": {
+    "post_code": "65221",
+    "city": "Karlstad",
+    "country_code": "SE",
+    "country": "Sweden"
+  },
+  "deliver_to": {
+    "post_code": "67191",
+    "city": "Arvika",
+    "country_code": "SE",
+    "country": "Sweden"
+  },
+  "dispatching_office": {
+    "city": "Karlstad",
+    "country_code": "SE",
     "country": "Sweden"
   },
   "events": [

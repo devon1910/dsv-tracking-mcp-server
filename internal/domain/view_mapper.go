@@ -8,12 +8,26 @@ import (
 
 // MapShipmentSummaryView projects a ShipmentSummary to a ShipmentSummaryView.
 func MapShipmentSummaryView(s ShipmentSummary) ShipmentSummaryView {
+	var startDate, endDate string
+	if s.StartDate != nil {
+		startDate = s.StartDate.UTC().Format(time.RFC3339)
+	}
+	if s.EndDate != nil {
+		endDate = s.EndDate.UTC().Format(time.RFC3339)
+	}
 	return ShipmentSummaryView{
 		ShipmentID:    s.ShipmentID,
+		STT:           s.STTNumber,
 		Reference:     s.STTNumber,
 		Status:        s.LastEventCode.Description(),
+		LastEventCode: s.LastEventRawCode,
 		TransportMode: s.TransportMode.String(),
 		DataProvider:  dataProviderFromShipmentID(s.ShipmentID),
+		Progress:      s.PercentageProgress,
+		FromLocation:  s.FromLocation,
+		ToLocation:    s.ToLocation,
+		StartDate:     startDate,
+		EndDate:       endDate,
 	}
 }
 
@@ -25,21 +39,21 @@ func MapShipmentDetailView(s Shipment) ShipmentDetailView {
 		events[i] = mapEventView(e)
 	}
 
-	sender := mapPartyView(s.Sender())
-	receiver := mapPartyView(s.Receiver())
-
 	return ShipmentDetailView{
-		ShipmentID:    s.ShipmentID,
-		Reference:     s.STTNumber,
-		Status:        s.Progress.ActiveStep.Description(),
-		TransportMode: s.TransportMode.String(),
-		DataProvider:  s.DataProvider,
-		Sender:        &sender,
-		Receiver:      &receiver,
-		Events:        events,
-		Packages:      mapPackagesView(s.Packages),
-		Goods:         mapGoodsView(s.Goods),
-		ViewInUIURL:   viewInUIURL(s.ShipmentID),
+		ShipmentID:        s.ShipmentID,
+		Reference:         s.STTNumber,
+		Status:            s.Progress.ActiveStep.Description(),
+		TransportMode:     s.TransportMode.String(),
+		DataProvider:      s.DataProvider,
+		ShipperPlace:      mapPlaceView(s.Locations.ShipperPlace),
+		ConsigneePlace:    mapPlaceView(s.Locations.ConsigneePlace),
+		CollectFrom:       mapPlaceView(s.Locations.CollectFrom),
+		DeliverTo:         mapPlaceView(s.Locations.DeliverTo),
+		DispatchingOffice: mapOfficeView(s.Locations.DispatchingOffice),
+		Events:            events,
+		Packages:          mapPackagesView(s.Packages),
+		Goods:             mapGoodsView(s.Goods),
+		ViewInUIURL:       viewInUIURL(s.ShipmentID),
 	}
 }
 
@@ -110,13 +124,26 @@ func mapGoodsView(g Goods) *GoodsView {
 	}
 }
 
-func mapPartyView(p Party) PartyView {
-	addr := strings.TrimSpace(p.Address.PostCode + " " + p.Address.City)
-	return PartyView{
-		Name:    p.Name, // always nil via DSV public API
-		Address: addr,
-		City:    p.Address.City,
-		Country: p.Address.Country,
+func mapPlaceView(p Place) *LocationView {
+	if p.City == "" && p.CountryCode == "" && p.PostCode == "" {
+		return nil
+	}
+	return &LocationView{
+		PostCode:    p.PostCode,
+		City:        p.City,
+		CountryCode: p.CountryCode,
+		Country:     p.Country,
+	}
+}
+
+func mapOfficeView(o Office) *LocationView {
+	if o.City == "" && o.CountryCode == "" {
+		return nil
+	}
+	return &LocationView{
+		City:        o.City,
+		CountryCode: o.CountryCode,
+		Country:     o.Country,
 	}
 }
 

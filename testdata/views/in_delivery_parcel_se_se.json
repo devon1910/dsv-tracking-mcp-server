@@ -4,14 +4,33 @@
   "status": "Out for delivery",
   "transport_mode": "LAND",
   "data_provider": "CTTS",
-  "sender": {
-    "address": "17562 Järfälla",
+  "shipper_place": {
+    "post_code": "17562",
     "city": "Järfälla",
+    "country_code": "SE",
     "country": "Sweden"
   },
-  "receiver": {
-    "address": "52151 Floby",
+  "consignee_place": {
+    "post_code": "52151",
     "city": "Floby",
+    "country_code": "SE",
+    "country": "Sweden"
+  },
+  "collect_from": {
+    "post_code": "17562",
+    "city": "Järfälla",
+    "country_code": "SE",
+    "country": "Sweden"
+  },
+  "deliver_to": {
+    "post_code": "52151",
+    "city": "Floby",
+    "country_code": "SE",
+    "country": "Sweden"
+  },
+  "dispatching_office": {
+    "city": "Stockholm",
+    "country_code": "SE",
     "country": "Sweden"
   },
   "events": [

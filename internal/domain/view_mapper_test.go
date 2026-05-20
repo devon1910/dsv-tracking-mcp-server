@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"testing"
+	"time"
 
 	"github.com/devon1910/dsv-tracking-mcp-server/internal/domain"
 	"github.com/devon1910/dsv-tracking-mcp-server/internal/upstream/dsv"
@@ -131,15 +132,74 @@ func TestViewMapper_EventsSortedChronologically(t *testing.T) {
 	}
 }
 
-func TestViewMapper_SenderNameIsNil(t *testing.T) {
-	s := loadDetailShipment(t, "delivered_ltl_se_fr.json")
+func TestViewMapper_LocationsPopulated(t *testing.T) {
+	s := loadDetailShipment(t, "booked_parcel_se_se_simple.json")
 	view := domain.MapShipmentDetailView(s)
-
-	if view.Sender == nil {
-		t.Fatal("Sender is nil")
+	if view.ShipperPlace == nil {
+		t.Fatal("ShipperPlace is nil")
 	}
-	if view.Sender.Name != nil {
-		t.Errorf("Sender.Name = %q, want nil (DSV public API never exposes party names)", *view.Sender.Name)
+	if view.ShipperPlace.PostCode != "44240" {
+		t.Errorf("ShipperPlace.PostCode = %q, want 44240", view.ShipperPlace.PostCode)
+	}
+	if view.ConsigneePlace == nil {
+		t.Fatal("ConsigneePlace is nil")
+	}
+	if view.ConsigneePlace.City != "Fjärås" {
+		t.Errorf("ConsigneePlace.City = %q, want Fjärås", view.ConsigneePlace.City)
+	}
+	if view.CollectFrom == nil {
+		t.Fatal("CollectFrom is nil")
+	}
+	if view.DispatchingOffice == nil {
+		t.Fatal("DispatchingOffice is nil")
+	}
+}
+
+func TestViewMapper_EmptyLocationsOmitted(t *testing.T) {
+	s := domain.Shipment{
+		ShipmentID: "LandStt:T:CTTS:LAND",
+		Progress:   domain.Progress{ActiveStep: domain.ProgressStageBooked},
+	}
+	view := domain.MapShipmentDetailView(s)
+	if view.ShipperPlace != nil {
+		t.Errorf("ShipperPlace should be nil for zero-value location")
+	}
+	if view.DispatchingOffice != nil {
+		t.Errorf("DispatchingOffice should be nil for zero-value location")
+	}
+}
+
+func TestViewMapper_SummaryEnrichedFields(t *testing.T) {
+	startDate, _ := time.Parse(time.RFC3339, "2026-05-15T00:00:00Z")
+	s := domain.ShipmentSummary{
+		ShipmentID:         "LandStt:LKG6022524:CTTS:LAND",
+		STTNumber:          "LKG6022524",
+		TransportMode:      domain.TransportModeLand,
+		PercentageProgress: 16,
+		LastEventCode:      domain.EventCodeENT,
+		LastEventRawCode:   "ENT",
+		FromLocation:       "Linköping",
+		ToLocation:         "Skive",
+		StartDate:          &startDate,
+	}
+	view := domain.MapShipmentSummaryView(s)
+	if view.STT != "LKG6022524" {
+		t.Errorf("STT = %q, want LKG6022524", view.STT)
+	}
+	if view.LastEventCode != "ENT" {
+		t.Errorf("LastEventCode = %q, want ENT", view.LastEventCode)
+	}
+	if view.Progress != 16 {
+		t.Errorf("Progress = %d, want 16", view.Progress)
+	}
+	if view.FromLocation != "Linköping" {
+		t.Errorf("FromLocation = %q, want Linköping", view.FromLocation)
+	}
+	if view.StartDate != "2026-05-15T00:00:00Z" {
+		t.Errorf("StartDate = %q, want 2026-05-15T00:00:00Z", view.StartDate)
+	}
+	if view.EndDate != "" {
+		t.Errorf("EndDate = %q, want empty", view.EndDate)
 	}
 }
 

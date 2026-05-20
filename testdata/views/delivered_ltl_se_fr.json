@@ -4,15 +4,34 @@
   "status": "Delivered",
   "transport_mode": "LAND",
   "data_provider": "CTTS",
-  "sender": {
-    "address": "46178 Sjuntorp",
+  "shipper_place": {
+    "post_code": "46178",
     "city": "Sjuntorp",
+    "country_code": "SE",
     "country": "Sweden"
   },
-  "receiver": {
-    "address": "62119 Dourges",
+  "consignee_place": {
+    "post_code": "62119",
     "city": "Dourges",
+    "country_code": "FR",
     "country": "France"
+  },
+  "collect_from": {
+    "post_code": "46178",
+    "city": "Sjuntorp",
+    "country_code": "SE",
+    "country": "Sweden"
+  },
+  "deliver_to": {
+    "post_code": "62119",
+    "city": "Dourges",
+    "country_code": "FR",
+    "country": "France"
+  },
+  "dispatching_office": {
+    "city": "Vänersborg",
+    "country_code": "SE",
+    "country": "Sweden"
   },
   "events": [
     {

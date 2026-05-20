@@ -4,15 +4,34 @@
   "status": "Booked",
   "transport_mode": "LAND",
   "data_provider": "CTTS",
-  "sender": {
-    "address": "58941 Linköping",
+  "shipper_place": {
+    "post_code": "58941",
     "city": "Linköping",
+    "country_code": "SE",
     "country": "Sweden"
   },
-  "receiver": {
-    "address": "7800 Skive",
+  "consignee_place": {
+    "post_code": "7800",
     "city": "Skive",
+    "country_code": "DK",
     "country": "Denmark"
+  },
+  "collect_from": {
+    "post_code": "58941",
+    "city": "Linköping",
+    "country_code": "SE",
+    "country": "Sweden"
+  },
+  "deliver_to": {
+    "post_code": "7800",
+    "city": "Skive",
+    "country_code": "DK",
+    "country": "Denmark"
+  },
+  "dispatching_office": {
+    "city": "Linköping",
+    "country_code": "SE",
+    "country": "Sweden"
   },
   "events": [
     {
