@@ -78,4 +78,63 @@ The `Server.AddReceivingMiddleware` hook wraps every incoming JSON-RPC method
 `method == "tools/call"` before recording tool-call metrics; otherwise every
 `initialize` handshake increments the counter.
 
-See `internal/mcp/server.go` `observingMiddleware` for the pattern.
+See `internal/mcp/server.go:62` (`observingMiddleware`) for the filter pattern.
+Registered at `internal/mcp/server.go:34`.
+
+---
+
+## `cdp.WithExecutor` required for `GetResponseBody` inside event handlers
+
+`network.GetResponseBody` uses the chromedp context to resolve the CDP target.
+Inside a `chromedp.ListenTarget` callback, the tab context may be mid-redirect,
+causing "invalid context" errors.
+
+**Fix**: capture `chromedp.FromContext(tabCtx).Target` synchronously in the
+event-loop goroutine, then build a detached executor:
+
+```go
+executor := cdp.WithExecutor(context.Background(), chromedpCtx.Target)
+body, err := network.GetResponseBody(reqID).Do(executor)
+```
+
+This bypasses the context lifecycle entirely and queries the already-buffered
+response body directly.
+
+See `internal/upstream/dsv/browser/browser.go:163`.
+
+---
+
+## `DefaultExecAllocatorOptions` sets `--enable-automation`
+
+Using `append(chromedp.DefaultExecAllocatorOptions[:], ...)` includes
+`--enable-automation`, which sets `navigator.webdriver = true`. Cap.js and
+similar bot-detection systems check this property.
+
+**Fix**: build allocator options from scratch, omitting automation flags, and
+explicitly add `--disable-blink-features=AutomationControlled`:
+
+```go
+opts := []chromedp.ExecAllocatorOption{
+    chromedp.NoFirstRun,
+    chromedp.NoDefaultBrowserCheck,
+    chromedp.Flag("disable-blink-features", "AutomationControlled"),
+    // ... other flags, but NOT chromedp.Flag("enable-automation", ...)
+}
+```
+
+See `internal/upstream/dsv/browser/browser.go` allocator construction.
+
+---
+
+## `singleflight.DoChan` — context cancellation is caller-side only
+
+`singleflight.Group.DoChan` starts a goroutine that runs to completion even if
+all callers cancel. The `select` in `Cache.Fetch` returns `ctx.Err()` when the
+context is done, but the underlying fetch goroutine continues and will populate
+the cache for future callers.
+
+This is intentional: a cancelled read should not abort a fetch that may benefit
+other concurrent callers. The cache entry is written regardless of whether the
+original caller waited for it.
+
+See `internal/cache/cache.go:111` (`DoChan` call) and `cache.go:139` (`select`).
