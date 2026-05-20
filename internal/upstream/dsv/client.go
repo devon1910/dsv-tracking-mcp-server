@@ -88,29 +88,12 @@ func (c *Client) Search(ctx context.Context, reference string) (*SearchResponseD
 // URL construction note: colons in shipmentIDs are NOT percent-encoded; the
 // upstream routing requires them raw. See UPSTREAM.md "Headers and Request
 // Requirements".
-// detailFetcher is an optional extension of Fetcher implemented by the real
-// browser. It navigates once and watches both the search XHR (fail-fast on
-// not-found) and the detail XHR, mirroring DSV's own frontend behaviour.
-type detailFetcher interface {
-	FetchDetailJSON(ctx context.Context, pageURL, searchSubstring, detailSubstring string) ([]byte, error)
-}
-
 func (c *Client) Detail(ctx context.Context, shipmentID string) (*ShipmentDetailDTO, error) {
 	stt := extractSTT(shipmentID)
 	pageURL := c.baseURL + "/app/tracking-public/?refNumber=" + url.QueryEscape(stt)
-	searchSubstring := pathSearch + "?query=" + stt
-	detailSubstring := "/shipments/land/" + shipmentID
+	xhrSubstring := "/shipments/land/" + shipmentID
 
-	var (
-		body []byte
-		err  error
-	)
-	if df, ok := c.fetcher.(detailFetcher); ok {
-		body, err = df.FetchDetailJSON(ctx, pageURL, searchSubstring, detailSubstring)
-	} else {
-		// Fallback for tests that inject a simple fake fetcher.
-		body, err = c.fetcher.FetchJSON(ctx, pageURL, detailSubstring)
-	}
+	body, err := c.fetcher.FetchJSON(ctx, pageURL, xhrSubstring)
 	if err != nil {
 		return nil, err
 	}
