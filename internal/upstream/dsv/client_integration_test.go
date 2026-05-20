@@ -11,6 +11,7 @@ import (
 	"github.com/devon1910/dsv-tracking-mcp-server/internal/domain"
 	"github.com/devon1910/dsv-tracking-mcp-server/internal/obs"
 	"github.com/devon1910/dsv-tracking-mcp-server/internal/upstream/dsv"
+	browserpkg "github.com/devon1910/dsv-tracking-mcp-server/internal/upstream/dsv/browser"
 )
 
 // Integration tests hit the live DSV public tracking API.
@@ -27,13 +28,24 @@ import (
 
 func integrationClient(t *testing.T) *dsv.Client {
 	t.Helper()
-	return dsv.NewClient(dsv.ClientConfig{
-		Metrics: obs.NewMetrics(),
+	// Launch a real browser for integration tests.
+	br, err := browserpkg.New(context.Background(), browserpkg.Config{
+		Headless: true,
+		Logger:   obs.NewLogger(),
+		Metrics:  obs.NewMetrics(),
 	})
+	if err != nil {
+		t.Fatalf("failed to launch browser: %v", err)
+	}
+	t.Cleanup(func() { _ = br.Close() })
+	return dsv.NewClient(dsv.ClientConfig{Browser: br, Metrics: obs.NewMetrics()})
 }
 
 func integrationRef(t *testing.T) string {
 	t.Helper()
+	if os.Getenv("BROWSER_INTEGRATION") == "false" {
+		t.Skip("BROWSER_INTEGRATION=false; skipping integration test")
+	}
 	ref := os.Getenv("DSV_INTEGRATION_REF")
 	if ref == "" {
 		t.Skip("DSV_INTEGRATION_REF not set; skipping integration test")
