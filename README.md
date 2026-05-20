@@ -2,10 +2,6 @@
 
 An [MCP](https://modelcontextprotocol.io/) (Model Context Protocol) server that exposes DSV's public shipment tracking API as LLM tools. Built as a Sendify code challenge submission.
 
-> **Note on carrier:** The challenge brief references DB Schenker. This implementation targets **DSV** (`mydsv.dsv.com`) — a different carrier. The server architecture is identical to what a DB Schenker implementation would look like; the DSV public API was selected because its tracking endpoint was accessible and fully documented during the challenge period.
-
----
-
 ## Requirements compliance
 
 | Requirement | Status | Notes |
