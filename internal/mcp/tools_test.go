@@ -295,7 +295,9 @@ func TestGetShipmentDetails_MalformedID(t *testing.T) {
 }
 
 func TestGetShipmentDetails_StaleFallback(t *testing.T) {
-	shipment := loadDetailFixture(t, "delivered_ltl_se_fr.json")
+	// Use an in-transit fixture: a DELIVERED shipment would get a 24 h TTL
+	// from the conditional-TTL logic and would never appear stale in this test.
+	shipment := loadDetailFixture(t, "dispatching_parcel_se_se.json")
 
 	// Short TTL to force expiry quickly.
 	shortDeps := mcpinternal.ToolDeps{
@@ -309,8 +311,9 @@ func TestGetShipmentDetails_StaleFallback(t *testing.T) {
 	s1 := mcpinternal.New(noopLogger(), obs.NewMetrics())
 	mcpinternal.RegisterAll(s1, shortDeps)
 
+	const sid = "LandStt:SEKSD620143489:CTTS:LAND" // dispatching (non-terminal)
 	// Prime cache.
-	callTool(t, s1, "get_shipment_details", map[string]any{"shipment_id": "LandStt:VAN5022058:CTTS:LAND"})
+	callTool(t, s1, "get_shipment_details", map[string]any{"shipment_id": sid})
 
 	// Let it expire.
 	time.Sleep(40 * time.Millisecond)
@@ -320,7 +323,7 @@ func TestGetShipmentDetails_StaleFallback(t *testing.T) {
 	s2 := mcpinternal.New(noopLogger(), obs.NewMetrics())
 	mcpinternal.RegisterAll(s2, shortDeps)
 
-	result := callTool(t, s2, "get_shipment_details", map[string]any{"shipment_id": "LandStt:VAN5022058:CTTS:LAND"})
+	result := callTool(t, s2, "get_shipment_details", map[string]any{"shipment_id": sid})
 	if result.IsError {
 		t.Fatalf("expected stale fallback, got error: %s", firstText(result))
 	}
@@ -328,6 +331,46 @@ func TestGetShipmentDetails_StaleFallback(t *testing.T) {
 	json.Unmarshal([]byte(firstText(result)), &out)
 	if out["freshness"] != "stale_fallback" {
 		t.Errorf("freshness = %v, want stale_fallback", out["freshness"])
+	}
+}
+
+// TestConditionalTTL_DeliveredShipmentGets24hTTL verifies that after fetching
+// a DELIVERED shipment, a second call well past the default 30 s TTL still
+// returns a cached result (24 h TTL was applied).
+func TestConditionalTTL_DeliveredShipmentGets24hTTL(t *testing.T) {
+	shipment := loadDetailFixture(t, "delivered_ltl_se_fr.json") // DELIVERED
+	up := &fakeUpstream{detailResult: shipment}
+
+	// Use a very short default TTL; the conditional 24 h TTL must override it.
+	const defaultTTL = 15 * time.Millisecond
+	deps := mcpinternal.ToolDeps{
+		Upstream:    up,
+		SearchCache: cache.New[[]domain.ShipmentSummary](cache.Config{TTL: time.Minute}, noopLogger()),
+		DetailCache: cache.New[domain.Shipment](cache.Config{TTL: defaultTTL, StaleWindow: defaultTTL}, noopLogger()),
+		Logger:      noopLogger(),
+		Metrics:     obs.NewMetrics(),
+	}
+	s := mcpinternal.New(noopLogger(), obs.NewMetrics())
+	mcpinternal.RegisterAll(s, deps)
+
+	// First call — live fetch.
+	callTool(t, s, "get_shipment_details", map[string]any{"shipment_id": "LandStt:VAN5022058:CTTS:LAND"})
+
+	// Wait past the default TTL; the conditional 24 h TTL must keep the entry alive.
+	time.Sleep(defaultTTL * 3)
+
+	result := callTool(t, s, "get_shipment_details", map[string]any{"shipment_id": "LandStt:VAN5022058:CTTS:LAND"})
+	if result.IsError {
+		t.Fatalf("unexpected error: %s", firstText(result))
+	}
+	var out map[string]any
+	json.Unmarshal([]byte(firstText(result)), &out)
+	if out["freshness"] != "cached" {
+		t.Errorf("freshness = %v, want cached (24 h TTL should still be valid)", out["freshness"])
+	}
+	// Upstream must not have been called a second time.
+	if up.detailCalls != 1 {
+		t.Errorf("detailCalls = %d, want 1 (cache hit expected)", up.detailCalls)
 	}
 }
 

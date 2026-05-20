@@ -294,6 +294,58 @@ func TestErrorChain_StaleEntryWithinWindow(t *testing.T) {
 	}
 }
 
+// TestSetWithTTL_ShortTTL verifies that an entry stored via SetWithTTL with a
+// short TTL expires as expected and a subsequent Fetch calls the upstream.
+func TestSetWithTTL_ShortTTL(t *testing.T) {
+	c := newCache(time.Minute, time.Minute) // large default TTL, overridden below
+	ctx := context.Background()
+
+	c.SetWithTTL("k", "val", 15*time.Millisecond)
+
+	// Immediately readable.
+	var calls int32
+	r, err := c.Fetch(ctx, "k", func(context.Context) (string, error) {
+		atomic.AddInt32(&calls, 1)
+		return "new", nil
+	})
+	if err != nil || r.Data != "val" || atomic.LoadInt32(&calls) != 0 {
+		t.Errorf("expected cached hit; got data=%q err=%v fetchCalls=%d", r.Data, err, calls)
+	}
+
+	// After TTL expires the upstream is called.
+	time.Sleep(30 * time.Millisecond)
+	r, err = c.Fetch(ctx, "k", func(context.Context) (string, error) {
+		atomic.AddInt32(&calls, 1)
+		return "new", nil
+	})
+	if err != nil || r.Data != "new" || atomic.LoadInt32(&calls) != 1 {
+		t.Errorf("expected live fetch after expiry; got data=%q err=%v fetchCalls=%d", r.Data, err, calls)
+	}
+}
+
+// TestSetWithTTL_LongTTL verifies a 24 h TTL (the delivered-shipment case):
+// the entry is still present well after the default TTL would have expired.
+func TestSetWithTTL_LongTTL(t *testing.T) {
+	const defaultTTL = 10 * time.Millisecond
+	c := newCache(defaultTTL, defaultTTL)
+	ctx := context.Background()
+
+	// Store with 24 h TTL (simulated as 1 s for test speed, still >> defaultTTL).
+	c.SetWithTTL("k", "delivered", time.Second)
+
+	// After the default TTL passes the entry must still be there.
+	time.Sleep(defaultTTL + 5*time.Millisecond)
+
+	var calls int32
+	r, err := c.Fetch(ctx, "k", func(context.Context) (string, error) {
+		atomic.AddInt32(&calls, 1)
+		return "miss", nil
+	})
+	if err != nil || r.Data != "delivered" || atomic.LoadInt32(&calls) != 0 {
+		t.Errorf("long-TTL entry evicted prematurely; data=%q err=%v calls=%d", r.Data, err, calls)
+	}
+}
+
 // TestContextCancellation verifies that a cancelled context propagates to the
 // caller while the underlying singleflight fetch completes independently.
 func TestContextCancellation(t *testing.T) {

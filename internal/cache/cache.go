@@ -153,6 +153,19 @@ func (c *Cache[T]) Fetch(ctx context.Context, key string, fetcher func(context.C
 	}
 }
 
+// SetWithTTL stores value under key with a caller-supplied TTL, overriding
+// any TTL stored in Config. Use this when different entries should expire at
+// different rates — for example, a Delivered shipment (immutable) can be
+// cached for 24 h while an in-transit shipment uses the default 30 s TTL.
+//
+// SetWithTTL always overwrites any existing entry for the key.
+func (c *Cache[T]) SetWithTTL(key string, value T, ttl time.Duration) {
+	now := time.Now()
+	c.mu.Lock()
+	c.items[key] = entry[T]{value: value, fetchedAt: now, expiresAt: now.Add(ttl)}
+	c.mu.Unlock()
+}
+
 // Invalidate removes the entry for key. Safe for concurrent use.
 func (c *Cache[T]) Invalidate(key string) {
 	c.mu.Lock()

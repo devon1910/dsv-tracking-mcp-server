@@ -168,6 +168,13 @@ func (h *toolHandlers) getShipmentDetails(
 		return nil, getShipmentDetailsOutput{}, te
 	}
 
+	// Conditional TTL: delivered shipments are immutable — extend their cache
+	// entry to 24 h so re-queries ("did it arrive?") never hit the browser.
+	// Non-terminal shipments keep the default 30 s TTL for freshness.
+	if resp.Data.Progress.ActiveStep == domain.ProgressStageDelivered && resp.Freshness == cache.FreshnessLive {
+		h.deps.DetailCache.SetWithTTL(sid, resp.Data, 24*time.Hour)
+	}
+
 	h.record("get_shipment_details", "success", start)
 	return nil, getShipmentDetailsOutput{
 		Shipment:    domain.MapShipmentDetailView(resp.Data),

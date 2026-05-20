@@ -68,10 +68,9 @@ func main() {
 		cache.Config{TTL: cfg.searchTTL, StaleWindow: 5 * cfg.searchTTL},
 		logger,
 	)
-	// Detail cache: 30s TTL for non-terminal statuses. A Delivered shipment
-	// would benefit from a 24h TTL (it's immutable), but our cache API does
-	// not support per-entry TTL. 30s is safe and keeps the data fresh enough
-	// for in-progress tracking. Future: add per-entry TTL to cache.Cache.
+	// Detail cache: 30s default TTL for non-terminal statuses.
+	// The get_shipment_details handler upgrades Delivered entries to 24h TTL
+	// via cache.SetWithTTL after each successful live fetch.
 	detailCache := cache.New[domain.Shipment](
 		cache.Config{TTL: cfg.detailTTL, StaleWindow: 5 * cfg.detailTTL},
 		logger,
