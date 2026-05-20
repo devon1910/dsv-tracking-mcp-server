@@ -126,15 +126,3 @@ See `internal/upstream/dsv/browser/browser.go` allocator construction.
 
 ---
 
-## `singleflight.DoChan` — context cancellation is caller-side only
-
-`singleflight.Group.DoChan` starts a goroutine that runs to completion even if
-all callers cancel. The `select` in `Cache.Fetch` returns `ctx.Err()` when the
-context is done, but the underlying fetch goroutine continues and will populate
-the cache for future callers.
-
-This is intentional: a cancelled read should not abort a fetch that may benefit
-other concurrent callers. The cache entry is written regardless of whether the
-original caller waited for it.
-
-See `internal/cache/cache.go:111` (`DoChan` call) and `cache.go:139` (`select`).

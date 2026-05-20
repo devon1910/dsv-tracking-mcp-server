@@ -108,6 +108,9 @@ func (c *Cache[T]) Fetch(ctx context.Context, key string, fetcher func(context.C
 	}
 
 	// Slow path: coalesce concurrent fetches via singleflight.
+	// DoChan starts a goroutine that runs to completion even if all callers
+	// cancel — a cancelled Fetch returns ctx.Err() via the select below, but
+	// the fetch goroutine continues and populates the cache for future callers.
 	ch := c.sf.DoChan(key, func() (any, error) {
 		val, fetchErr := fetcher(ctx)
 		if fetchErr == nil {

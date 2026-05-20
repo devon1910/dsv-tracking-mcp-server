@@ -34,8 +34,11 @@ Option 2: include `Name *string` in `domain.Party`. Rationale:
 
 ## Consequences
 
-- `domain.Party.Name` is always `nil` in practice today. Code that assumes it
-  is non-nil will panic; call sites must nil-check or use the view mapper which
+- `domain.Party.Name` is `nil` for all data sourced from DSV's public tracking
+  API, because that API does not expose party names. Code that assumes it is
+  non-nil will panic; call sites must nil-check or use the view mapper which
   handles this.
-- If a future authenticated source populates `Name`, no schema change is
-  required on the MCP wire format.
+- The pointer field reserves the option to surface names if a future
+  authenticated integration tier returns them, without a wire-format change.
+  Until such a source exists the field remains `nil` by design, not as a
+  transient state.
