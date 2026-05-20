@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"fmt"
+
 	"github.com/devon1910/dsv-tracking-mcp-server/internal/cache"
 )
 
@@ -220,6 +222,75 @@ func TestSingleflight(t *testing.T) {
 
 	if n := atomic.LoadInt32(&callCount); n != 1 {
 		t.Errorf("fetcher called %d times, want 1", n)
+	}
+}
+
+// TestErrorChain_NoStaleEntry verifies that errors.Is works on errors returned
+// by Fetch when there is no usable stale entry. The cache must not wrap the
+// fetcher's error — callers rely on errors.Is to discriminate sentinel values
+// (e.g. domain.ErrShipmentNotFound) without string-matching.
+func TestErrorChain_NoStaleEntry(t *testing.T) {
+	// Use a tiny stale window so both TTL AND stale window expire quickly.
+	const ttl = 10 * time.Millisecond
+	const staleWindow = 5 * time.Millisecond
+	c := newCache(ttl, staleWindow)
+	ctx := context.Background()
+
+	// Prime the cache.
+	if _, err := c.Fetch(ctx, "k", func(context.Context) (string, error) { return "v", nil }); err != nil {
+		t.Fatal(err)
+	}
+
+	// Wait past both TTL and stale window.
+	time.Sleep(ttl + staleWindow + 20*time.Millisecond)
+
+	// Simulate *domain.UpstreamError wrapping domain.ErrShipmentNotFound by
+	// using fmt.Errorf("%w") to build a chain that errors.Is can walk.
+	sentinel := errors.New("not found sentinel")
+	wrappedErr := fmt.Errorf("upstream detail: %w", sentinel)
+
+	_, fetchErr := c.Fetch(ctx, "k", func(context.Context) (string, error) {
+		return "", wrappedErr
+	})
+
+	if fetchErr == nil {
+		t.Fatal("expected error, got nil (stale window should have expired)")
+	}
+	if !errors.Is(fetchErr, sentinel) {
+		t.Errorf("errors.Is(sentinel) = false; cache must not re-wrap fetcher errors.\ngot: %v (type %T)", fetchErr, fetchErr)
+	}
+}
+
+// TestErrorChain_StaleEntryWithinWindow verifies that when a stale entry is
+// within the stale window, Fetch returns the stale data with nil error even
+// when the fetcher fails — the fetcher's error is deliberately discarded so
+// the caller receives a useful stale response rather than an error.
+func TestErrorChain_StaleEntryWithinWindow(t *testing.T) {
+	const ttl = 10 * time.Millisecond
+	const staleWindow = 200 * time.Millisecond
+	c := newCache(ttl, staleWindow)
+	ctx := context.Background()
+
+	// Prime then let the TTL expire (but not the stale window).
+	if _, _ = c.Fetch(ctx, "k", func(context.Context) (string, error) { return "stale", nil }); false {
+	}
+	time.Sleep(ttl + 5*time.Millisecond)
+
+	sentinel := errors.New("upstream down")
+	resp, err := c.Fetch(ctx, "k", func(context.Context) (string, error) {
+		return "", sentinel
+	})
+
+	// In the stale-fallback path the cache swallows the fetcher error and
+	// returns the stale value. There is no error to check errors.Is against.
+	if err != nil {
+		t.Errorf("expected nil error in stale-fallback path, got: %v", err)
+	}
+	if resp.Freshness != cache.FreshnessStaleFallback {
+		t.Errorf("Freshness = %q, want stale_fallback", resp.Freshness)
+	}
+	if resp.Data != "stale" {
+		t.Errorf("Data = %q, want stale", resp.Data)
 	}
 }
 
