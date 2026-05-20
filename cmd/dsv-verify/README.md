@@ -24,4 +24,4 @@ The tool calls made are:
 2. `track_shipment reference=1806290829` — resolves waybill → shipment summary
 3. `get_shipment_details shipment_id=LandStt:VAN5022058:CTTS:LAND` — full detail
 
-Expected outputs are captured in `docs/PHASE_4_VERIFICATION.md`.
+Sample output for each call is printed to stdout in Markdown-fenced JSON blocks, suitable for pasting into a verification document.
