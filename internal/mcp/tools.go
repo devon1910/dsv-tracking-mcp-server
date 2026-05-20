@@ -164,6 +164,27 @@ func (h *toolHandlers) getShipmentDetails(
 	})
 	if err != nil {
 		te := errFromUpstream(err)
+
+		// When the detail XHR times out it usually means the shipment ID doesn't
+		// exist (DSV's page never fires the detail XHR for unknown shipments).
+		// Disambiguate by searching for the STT: a cache hit costs nothing; a
+		// miss fires a fast search call. Empty results → SHIPMENT_NOT_FOUND with
+		// a helpful message. A search failure means DSV is genuinely unreachable.
+		if te.Code == CodeUpstreamUnavailable {
+			stt := strings.Split(sid, ":")[1]
+			cacheKey := strings.ToLower(stt) + "|"
+			searchResp, searchErr := h.deps.SearchCache.Fetch(ctx, cacheKey, func(ctx context.Context) ([]domain.ShipmentSummary, error) {
+				return h.deps.Upstream.Search(ctx, stt)
+			})
+			if searchErr == nil && len(searchResp.Data) == 0 {
+				h.record("get_shipment_details", "not_found", start)
+				return nil, getShipmentDetailsOutput{}, &ToolError{
+					Code:    CodeShipmentNotFound,
+					Message: "no shipment found — the shipment_id may contain a typo",
+				}
+			}
+		}
+
 		h.record("get_shipment_details", string(te.Code), start)
 		return nil, getShipmentDetailsOutput{}, te
 	}
