@@ -83,46 +83,15 @@ Registered at `internal/mcp/server.go:34`.
 
 ---
 
-## `cdp.WithExecutor` required for `GetResponseBody` inside event handlers
+## Chromedp / Cap.js bypass
 
-`network.GetResponseBody` uses the chromedp context to resolve the CDP target.
-Inside a `chromedp.ListenTarget` callback, the tab context may be mid-redirect,
-causing "invalid context" errors.
+The browser-specific challenges (`navigator.webdriver` detection, `GetResponseBody` "invalid context", session amortisation) are documented in full in [docs/UPSTREAM.md — Anti-bot protection](UPSTREAM.md#anti-bot-protection), alongside the Cap.js background and the reasons a plain HTTP client cannot work against this API.
 
-**Fix**: capture `chromedp.FromContext(tabCtx).Target` synchronously in the
-event-loop goroutine, then build a detached executor:
+The two key fixes in brief:
+- **navigator.webdriver**: build the allocator from scratch, never use `DefaultExecAllocatorOptions`, add `--disable-blink-features=AutomationControlled`
+- **GetResponseBody invalid context**: use `cdp.WithExecutor(context.Background(), chromedpCtx.Target)` captured synchronously inside the event-loop goroutine
 
-```go
-executor := cdp.WithExecutor(context.Background(), chromedpCtx.Target)
-body, err := network.GetResponseBody(reqID).Do(executor)
-```
-
-This bypasses the context lifecycle entirely and queries the already-buffered
-response body directly.
-
-See `internal/upstream/dsv/browser/browser.go:163`.
-
----
-
-## `DefaultExecAllocatorOptions` sets `--enable-automation`
-
-Using `append(chromedp.DefaultExecAllocatorOptions[:], ...)` includes
-`--enable-automation`, which sets `navigator.webdriver = true`. Cap.js and
-similar bot-detection systems check this property.
-
-**Fix**: build allocator options from scratch, omitting automation flags, and
-explicitly add `--disable-blink-features=AutomationControlled`:
-
-```go
-opts := []chromedp.ExecAllocatorOption{
-    chromedp.NoFirstRun,
-    chromedp.NoDefaultBrowserCheck,
-    chromedp.Flag("disable-blink-features", "AutomationControlled"),
-    // ... other flags, but NOT chromedp.Flag("enable-automation", ...)
-}
-```
-
-See `internal/upstream/dsv/browser/browser.go` allocator construction.
+Source: `internal/upstream/dsv/browser/browser.go`
 
 ---
 

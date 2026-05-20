@@ -249,11 +249,60 @@ The `code` field is the stable machine-readable contract. The `message` is human
 
 ## Anti-bot protection
 
-Every endpoint under `/nges-portal/api/public/tracking-public/` is gated by Cap.js — a combined SHA-256 proof-of-work and browser-instrumentation challenge. Cap.js intentionally couples a PoW puzzle with browser instrumentation checks that validate DOM interactions and other browser behaviours. Programmatic bypass of the instrumentation layer is not the intended or supported path.
+### What Cap.js is
 
-To operate reliably against the public tracking API the MCP server runs a real headless Chromium instance (via chromedp) so Cap.js resolves naturally in a genuine browser environment. This is slower at cold-start and consumes more memory than a pure HTTP client, but it is the principled approach that avoids circumventing the upstream's instrumentation checks. See https://capjs.js.org/ and https://trycap.dev/agent.md for background.
+Every endpoint under `/nges-portal/api/public/tracking-public/` is gated by Cap.js — a combined SHA-256 proof-of-work and browser-instrumentation challenge. Unlike a simple CAPTCHA, Cap.js couples a PoW puzzle with deep browser environment checks: it validates the presence of real browser APIs (DOM, canvas, WebGL), inspects `navigator` properties, and detects headless/automated browser signatures. A plain HTTP client gets an immediate 429; a naive headless browser gets detected and also fails.
 
-Because the browser process shares cookies and other session state across tabs, solving Cap.js once in a warm browser session amortises across subsequent requests until the session state expires.
+### What we tried first
+
+The initial approach was a standard retrying HTTP client (exponential backoff, up to 3 attempts). This worked on the first call (before Cap.js activated) but reliably failed from the second request onward. Every retry returned 429 regardless of wait time because Cap.js had flagged the client as non-browser traffic.
+
+### Why a headless browser
+
+Running a real Chromium instance via [`chromedp`](https://github.com/chromedp/chromedp) means Cap.js runs inside a genuine V8 JavaScript environment with all the browser APIs it checks. The proof-of-work is solved by the page's own JavaScript — we never touch the PoW algorithm directly. This is slower at cold-start (5–10 s for the first request) and consumes more memory (~150 MB for the Chrome process), but it is the correct approach: the browser behaves exactly as a real user's browser would.
+
+### The `navigator.webdriver` detection problem
+
+The first headless Chrome attempt still got detected. The cause: `chromedp`'s `DefaultExecAllocatorOptions` includes `--enable-automation`, which sets `navigator.webdriver = true` in JavaScript. Cap.js checks this property explicitly — any browser where `navigator.webdriver` is truthy is treated as automated.
+
+**Fix:** build the Chrome allocator option list from scratch rather than extending the defaults. Never include `--enable-automation`. Add `--disable-blink-features=AutomationControlled` to suppress the webdriver property:
+
+```go
+opts := []chromedp.ExecAllocatorOption{
+    chromedp.NoFirstRun,
+    chromedp.NoDefaultBrowserCheck,
+    chromedp.Flag("disable-blink-features", "AutomationControlled"),
+    chromedp.Flag("headless", "new"),
+    // ... other flags — but NOT chromedp.Flag("enable-automation", ...)
+}
+allocCtx, _ := chromedp.NewExecAllocator(ctx, opts...)
+```
+
+This makes the headless browser indistinguishable from a regular Chrome window on the properties Cap.js inspects.
+
+### The `GetResponseBody` "invalid context" problem
+
+After fixing detection, a second bug appeared: `network.GetResponseBody` returned an "invalid context" error when called from the `EventLoadingFinished` callback. The cause: Chrome dispatches network events asynchronously; by the time the `LoadingFinished` event fires, the tab's context may be mid-redirect, making the chromedp context stale.
+
+**Fix:** capture the raw CDP `Target` executor synchronously inside the event handler goroutine (before any goroutine launch), then wrap it in a fresh `context.Background()`:
+
+```go
+chromedpCtx := chromedp.FromContext(tabCtx)
+executor := cdp.WithExecutor(context.Background(), chromedpCtx.Target)
+
+go func(reqID network.RequestID) {
+    body, err := network.GetResponseBody(reqID).Do(executor)
+    // ...
+}(requestID)
+```
+
+`cdp.WithExecutor` bypasses the chromedp context lifecycle entirely and queries the tab directly. This is robust to redirects and tab lifecycle transitions.
+
+### Session amortisation
+
+Because the Chrome process is a long-lived singleton (shared `browserCtx`), Cap.js cookies and session tokens persist across all tab-level calls. The PoW challenge is solved once on the first request; every subsequent request in the same process lifetime reuses the solved session state. Cold-start latency is paid once per server restart.
+
+Source: `internal/upstream/dsv/browser/browser.go`
 
 ---
 
