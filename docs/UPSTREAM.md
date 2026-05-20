@@ -257,6 +257,29 @@ Because the browser process shares cookies and other session state across tabs, 
 
 ---
 
+## MCP Tool Surfaces
+
+Three tools are registered by the server (Phase 4). Each returns a freshness tag and a retrieved_at timestamp.
+
+### `track_shipment`
+- **Input**: `reference` (string, required); `reference_type` (string, optional — one of the 21 codes from `list_reference_types`)
+- **Output**: `{ shipments: [ShipmentSummaryView], freshness, retrieved_at }`
+- **Error codes**: `INVALID_INPUT`, `INVALID_REFERENCE_TYPE`, `UPSTREAM_ERROR`
+- **Cache**: search cache, key = `lower(reference)|reference_type`, TTL 60 s
+
+### `get_shipment_details`
+- **Input**: `shipment_id` (string, required — composite form `Provider:Ref:DataProvider:Mode`)
+- **Output**: `{ shipment: ShipmentDetailView, freshness, retrieved_at }`
+- **Error codes**: `INVALID_SHIPMENT_ID`, `SHIPMENT_NOT_FOUND`, `UPSTREAM_ERROR`
+- **Cache**: detail cache, key = `shipment_id`, TTL 30 s
+
+### `list_reference_types`
+- **Input**: none
+- **Output**: `{ reference_types: [{ code, label, pattern }], freshness: "static" }`
+- **No upstream call** — returns the bundled `internal/data/reference_types.json`
+
+---
+
 ## Known Gaps (not implemented in v1)
 
 - SEA, AIR, and RAIL transport modes — only `LAND` samples observed; endpoint URL pattern supports other modes via the `{transportMode}` path segment.
