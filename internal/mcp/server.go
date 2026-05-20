@@ -42,6 +42,12 @@ func (s *Server) Run(ctx context.Context) error {
 	return s.sdk.Run(ctx, &sdkmcp.StdioTransport{})
 }
 
+// RunTransport starts the MCP server over the given transport. Used by tests
+// that inject an in-memory transport instead of stdio.
+func (s *Server) RunTransport(ctx context.Context, t sdkmcp.Transport) error {
+	return s.sdk.Run(ctx, t)
+}
+
 // RegisterTool adds a typed tool to the underlying SDK server. Cross-cutting
 // concerns (request IDs, logging, metrics) are provided by the receiving
 // middleware installed at construction time.

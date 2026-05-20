@@ -18,6 +18,10 @@ type Metrics struct {
 	DSVBrowserFetches *prometheus.CounterVec   // labels: endpoint, status
 	DSVBrowserLatency *prometheus.HistogramVec // labels: endpoint
 
+	// DSV MCP tool-level outcome metrics (finer-grained than ToolCalls above).
+	DSVMCPCalls   *prometheus.CounterVec   // labels: tool, outcome
+	DSVMCPLatency *prometheus.HistogramVec // labels: tool
+
 	reg *prometheus.Registry
 }
 
@@ -44,8 +48,18 @@ func NewMetrics() *Metrics {
 			Help:    "Latency of DSV browser-backed fetches in seconds.",
 			Buckets: prometheus.DefBuckets,
 		}, []string{"endpoint"}),
+		DSVMCPCalls: prometheus.NewCounterVec(prometheus.CounterOpts{
+			Name: "dsv_mcp_tool_calls_total",
+			Help: "DSV MCP tool calls partitioned by tool name and outcome.",
+		}, []string{"tool", "outcome"}),
+		DSVMCPLatency: prometheus.NewHistogramVec(prometheus.HistogramOpts{
+			Name:    "dsv_mcp_tool_latency_seconds",
+			Help:    "Latency of DSV MCP tool calls in seconds.",
+			Buckets: prometheus.DefBuckets,
+		}, []string{"tool"}),
 	}
-	reg.MustRegister(m.ToolCalls, m.ToolLatency, m.DSVBrowserFetches, m.DSVBrowserLatency)
+	reg.MustRegister(m.ToolCalls, m.ToolLatency, m.DSVBrowserFetches, m.DSVBrowserLatency,
+		m.DSVMCPCalls, m.DSVMCPLatency)
 	return m
 }
 
