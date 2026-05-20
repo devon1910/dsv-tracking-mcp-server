@@ -23,5 +23,20 @@
       "location": "Stockholm (SE)"
     }
   ],
+  "goods": {
+    "pieces": 1,
+    "weight": {
+      "value": 8,
+      "unit": "KGS"
+    },
+    "volume": {
+      "value": 0.05,
+      "unit": "CBM"
+    },
+    "loading_meters": {
+      "value": 0,
+      "unit": "MTR"
+    }
+  },
   "view_in_ui_url": "https://mydsv.dsv.com/app/tracking-public/?refNumber=SESTO620298048"
 }

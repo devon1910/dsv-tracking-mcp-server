@@ -86,5 +86,20 @@
       "location": "Dourges (FR)"
     }
   ],
+  "goods": {
+    "pieces": 2,
+    "weight": {
+      "value": 800,
+      "unit": "KGS"
+    },
+    "volume": {
+      "value": 5.28,
+      "unit": "CBM"
+    },
+    "loading_meters": {
+      "value": 1.4,
+      "unit": "MTR"
+    }
+  },
   "view_in_ui_url": "https://mydsv.dsv.com/app/tracking-public/?refNumber=VAN5022058"
 }

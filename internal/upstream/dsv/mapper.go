@@ -85,6 +85,7 @@ func MapShipmentDetail(dto *ShipmentDetailDTO) (domain.Shipment, error) {
 			Weight:        mapMeasurement(dto.Goods.Weight),
 			Volume:        mapMeasurement(dto.Goods.Volume),
 			LoadingMeters: mapMeasurement(dto.Goods.LoadingMeters),
+			Dimensions:    mapDimensions(dto.Goods.Dimensions),
 		},
 		Events:   events,
 		Packages: packages,
@@ -133,6 +134,26 @@ func MapShipmentSummaries(dto *SearchResponseDTO) []domain.ShipmentSummary {
 
 func mapMeasurement(dto measurementDTO) domain.Measurement {
 	return domain.Measurement{Value: dto.Value, Unit: dto.Unit}
+}
+
+func mapDimensions(dtos []dimensionDTO) []domain.Dimension {
+	dims := make([]domain.Dimension, 0, len(dtos))
+	for _, d := range dtos {
+		dims = append(dims, domain.Dimension{
+			Length: mapMeasurementPtr(d.Length),
+			Width:  mapMeasurementPtr(d.Width),
+			Height: mapMeasurementPtr(d.Height),
+		})
+	}
+	return dims
+}
+
+func mapMeasurementPtr(dto *measurementDTO) *domain.Measurement {
+	if dto == nil {
+		return nil
+	}
+	m := mapMeasurement(*dto)
+	return &m
 }
 
 func mapPlace(dto placeDTO) domain.Place {

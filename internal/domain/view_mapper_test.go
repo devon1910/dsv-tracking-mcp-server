@@ -143,6 +143,40 @@ func TestViewMapper_SenderNameIsNil(t *testing.T) {
 	}
 }
 
+func TestViewMapper_GoodsPopulated(t *testing.T) {
+	s := loadDetailShipment(t, "booked_parcel_se_se_simple.json")
+	view := domain.MapShipmentDetailView(s)
+	if view.Goods == nil {
+		t.Fatal("Goods is nil")
+	}
+	if view.Goods.Pieces != 1 {
+		t.Errorf("Pieces = %d, want 1", view.Goods.Pieces)
+	}
+	if view.Goods.Weight == nil || view.Goods.Weight.Value != 4.0 || view.Goods.Weight.Unit != "KGS" {
+		t.Errorf("Weight = %+v, want {4.0 KGS}", view.Goods.Weight)
+	}
+	if view.Goods.Dimensions != nil {
+		t.Errorf("Dimensions = %v, want nil (empty upstream array)", view.Goods.Dimensions)
+	}
+}
+
+func TestViewMapper_GoodsNullMeasurementOmitted(t *testing.T) {
+	g := domain.Goods{Pieces: 0, Weight: domain.Measurement{Value: 0, Unit: ""}}
+	view := domain.MapShipmentDetailView(domain.Shipment{
+		ShipmentID: "LandStt:T:CTTS:LAND",
+		Goods:      g,
+		Progress:   domain.Progress{ActiveStep: domain.ProgressStageBooked},
+		Events:     nil,
+		Packages:   nil,
+	})
+	if view.Goods == nil {
+		t.Fatal("Goods is nil — should always be emitted")
+	}
+	if view.Goods.Weight != nil {
+		t.Errorf("Weight = %+v, want nil (empty unit)", view.Goods.Weight)
+	}
+}
+
 func TestViewMapper_UnknownEventCodePreservesRawCode(t *testing.T) {
 	var dto dsv.ShipmentDetailDTO
 	raw := []byte(`{

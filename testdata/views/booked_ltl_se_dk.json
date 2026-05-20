@@ -23,5 +23,20 @@
       "location": "Linköping (SE)"
     }
   ],
+  "goods": {
+    "pieces": 3,
+    "weight": {
+      "value": 5434,
+      "unit": "KGS"
+    },
+    "volume": {
+      "value": 15.396,
+      "unit": "CBM"
+    },
+    "loading_meters": {
+      "value": 3.9,
+      "unit": "MTR"
+    }
+  },
   "view_in_ui_url": "https://mydsv.dsv.com/app/tracking-public/?refNumber=LKG6022524"
 }

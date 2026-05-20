@@ -75,11 +75,17 @@ type referencesDTO struct {
 	OriginalStt                     *string  `json:"originalStt"`
 }
 
+type dimensionDTO struct {
+	Length *measurementDTO `json:"length,omitempty"`
+	Width  *measurementDTO `json:"width,omitempty"`
+	Height *measurementDTO `json:"height,omitempty"`
+}
+
 type goodsDTO struct {
 	Pieces               int            `json:"pieces"`
 	Volume               measurementDTO `json:"volume"`
 	Weight               measurementDTO `json:"weight"`
-	Dimensions           []interface{}  `json:"dimensions"`    // always [] in observed data
+	Dimensions           []dimensionDTO `json:"dimensions"`
 	LoadingMeters        measurementDTO `json:"loadingMeters"`
 	Stackable            *bool          `json:"stackable"`
 	ChargeableWeight     *float64       `json:"chargeableWeight"`

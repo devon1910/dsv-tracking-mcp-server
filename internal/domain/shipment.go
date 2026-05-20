@@ -43,14 +43,19 @@ type References struct {
 }
 
 // Goods describes the cargo dimensions and weight.
-//
-// Omitted upstream fields (never populated in observed data):
-// dimensions, stackable, chargeableWeight, agreementDangerousRoad, customsDuty.
 type Goods struct {
 	Pieces        int
 	Weight        Measurement
 	Volume        Measurement
 	LoadingMeters Measurement // zero for DSVparcel shipments
+	Dimensions    []Dimension
+}
+
+// Dimension holds length/width/height measurements for a single package or pallet.
+type Dimension struct {
+	Length *Measurement
+	Width  *Measurement
+	Height *Measurement
 }
 
 // Measurement pairs a numeric value with its unit string.

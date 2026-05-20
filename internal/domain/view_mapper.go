@@ -37,6 +37,7 @@ func MapShipmentDetailView(s Shipment) ShipmentDetailView {
 		Sender:        &sender,
 		Receiver:      &receiver,
 		Events:        events,
+		Goods:         mapGoodsView(s.Goods),
 		ViewInUIURL:   viewInUIURL(s.ShipmentID),
 	}
 }
@@ -54,6 +55,39 @@ func mapEventView(e Event) EventView {
 		RawCode:     e.RawCode,
 		Description: e.Code.Description(),
 		Location:    loc,
+	}
+}
+
+func mapMeasurementView(m Measurement) *MeasurementView {
+	if m.Unit == "" {
+		return nil
+	}
+	return &MeasurementView{Value: m.Value, Unit: m.Unit}
+}
+
+func mapMeasurementPtrView(m *Measurement) *MeasurementView {
+	if m == nil {
+		return nil
+	}
+	return mapMeasurementView(*m)
+}
+
+func mapGoodsView(g Goods) *GoodsView {
+	var dims []DimensionView
+	for _, d := range g.Dimensions {
+		dv := DimensionView{
+			Length: mapMeasurementPtrView(d.Length),
+			Width:  mapMeasurementPtrView(d.Width),
+			Height: mapMeasurementPtrView(d.Height),
+		}
+		dims = append(dims, dv)
+	}
+	return &GoodsView{
+		Pieces:        g.Pieces,
+		Weight:        mapMeasurementView(g.Weight),
+		Volume:        mapMeasurementView(g.Volume),
+		LoadingMeters: mapMeasurementView(g.LoadingMeters),
+		Dimensions:    dims,
 	}
 }
 

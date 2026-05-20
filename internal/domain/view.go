@@ -16,6 +16,28 @@ type ShipmentSummaryView struct {
 	DataProvider  string `json:"data_provider"`
 }
 
+// MeasurementView is a numeric value with its unit.
+type MeasurementView struct {
+	Value float64 `json:"value"`
+	Unit  string  `json:"unit"`
+}
+
+// DimensionView holds optional length/width/height for a single item.
+type DimensionView struct {
+	Length *MeasurementView `json:"length,omitempty"`
+	Width  *MeasurementView `json:"width,omitempty"`
+	Height *MeasurementView `json:"height,omitempty"`
+}
+
+// GoodsView summarises cargo weight, volume, and piece count.
+type GoodsView struct {
+	Pieces        int              `json:"pieces"`
+	Weight        *MeasurementView `json:"weight,omitempty"`
+	Volume        *MeasurementView `json:"volume,omitempty"`
+	LoadingMeters *MeasurementView `json:"loading_meters,omitempty"`
+	Dimensions    []DimensionView  `json:"dimensions,omitempty"`
+}
+
 // ShipmentDetailView is returned by the get_shipment_details tool.
 type ShipmentDetailView struct {
 	ShipmentID    string      `json:"shipment_id"`
@@ -26,6 +48,7 @@ type ShipmentDetailView struct {
 	Sender        *PartyView  `json:"sender,omitempty"`
 	Receiver      *PartyView  `json:"receiver,omitempty"`
 	Events        []EventView `json:"events"`
+	Goods         *GoodsView  `json:"goods,omitempty"`
 	ViewInUIURL   string      `json:"view_in_ui_url,omitempty"`
 }
 
