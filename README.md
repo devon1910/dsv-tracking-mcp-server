@@ -15,7 +15,7 @@ A Model Context Protocol (MCP) server written in Go that wraps DSV's public ship
 
 ## Setup
 
-Requires Go 1.25+. Run `make build` to compile the binary to `bin/dsv-tracking-mcp-server`.
+Requires Go 1.25+ and Chrome (or Chromium) installed and discoverable via `PATH` or `CHROMEDP_EXEC_PATH` env var. Run `make build` to compile the binary to `bin/dsv-tracking-mcp-server`.
 
 ## Usage
 
@@ -30,8 +30,13 @@ Environment variables:
 |---------------------|---------|--------------------------------------------------|
 | `LOG_LEVEL`         | `info`  | Log level: `debug`, `info`, `warn`, `error`      |
 | `METRICS_ADDR`      | `:9090` | Address for the Prometheus metrics HTTP server   |
-| `CACHE_TTL`         | `5m`    | How long a cached shipment result is considered fresh |
-| `CACHE_STALE_WINDOW`| `15m`   | How long past TTL a stale result may be served on upstream failure |
+| `CACHE_TTL`              | `5m`    | How long a cached shipment result is considered fresh |
+| `CACHE_STALE_WINDOW`     | `15m`   | How long past TTL a stale result may be served on upstream failure |
+| `BROWSER_HEADLESS`       | `true`  | Set to `false` to watch the browser window (useful for local debugging) |
+| `BROWSER_NO_SANDBOX`     | `false` | Set to `true` when running in environments without user namespaces (e.g. some Docker setups) |
+| `BROWSER_NAVIGATION_TIMEOUT` | `30s` | Maximum time to wait for a page's load event |
+| `BROWSER_XHR_TIMEOUT`   | `20s`   | Maximum time to wait for the tracking API XHR after page load |
+| `CHROMEDP_EXEC_PATH`     | *(auto)* | Override Chrome binary path; auto-discovered from PATH if unset |
 
 ## Architecture
 
@@ -42,6 +47,16 @@ To be completed in Phase 5.
 Run `make test` to execute the test suite with the race detector (`go test -race ./...`).
 The race detector requires CGO and a C compiler; on CI this runs on Ubuntu.
 
+Run integration tests against the live DSV API (requires Chrome and a working reference):
+```
+DSV_INTEGRATION_REF=VAN5022058 make test-integration
+```
+
+## Startup behaviour
+
+The server launches a headless Chrome process at startup. This adds approximately 2–4 seconds to cold-start time. Once Cap.js validates in the first request, subsequent requests reuse the browser's session state (cookies) until the session expires — the captcha is solved once and amortised across all requests.
+
 ## Limitations
 
-To be completed in Phase 5.
+- Requires a working Chrome or Chromium installation. Running in distroless containers requires bundling a Chromium binary and pointing `CHROMEDP_EXEC_PATH` at it.
+- Tested with LAND transport mode only; SEA/AIR/RAIL transport modes are not implemented in v1.

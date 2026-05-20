@@ -12,6 +12,7 @@ import (
 	"github.com/devon1910/dsv-tracking-mcp-server/internal/mcp"
 	"github.com/devon1910/dsv-tracking-mcp-server/internal/obs"
 	"github.com/devon1910/dsv-tracking-mcp-server/internal/upstream/dsv"
+	"github.com/devon1910/dsv-tracking-mcp-server/internal/upstream/dsv/browser"
 )
 
 func main() {
@@ -20,11 +21,31 @@ func main() {
 	logger := obs.NewLogger()
 	metrics := obs.NewMetrics()
 
+	// Construct browser-backed DSV client.
+	headless := envOr("BROWSER_HEADLESS", "true") == "true"
+	navTO := mustDuration("BROWSER_NAVIGATION_TIMEOUT", 30*time.Second)
+	xhrTO := mustDuration("BROWSER_XHR_TIMEOUT", 20*time.Second)
+
+	br, err := browser.New(context.Background(), browser.Config{
+		Headless:          headless,
+		NavigationTimeout: navTO,
+		XHRTimeout:        xhrTO,
+		Logger:            logger,
+		Metrics:           metrics,
+	})
+	if err != nil {
+		logger.Error("failed to launch browser", slog.Any("err", err))
+		os.Exit(1)
+	}
+	defer br.Close()
+
 	dsvClient := dsv.NewClient(dsv.ClientConfig{
+		Browser: br,
+		BaseURL: "https://mydsv.dsv.com",
 		Logger:  logger,
 		Metrics: metrics,
 	})
-	logger.Info("DSV client constructed", slog.String("base_url", "https://mydsv.dsv.com"))
+	logger.Info("DSV client ready (browser-backed)", slog.String("base_url", "https://mydsv.dsv.com"))
 	_ = dsvClient // Phase 4 wires this into tool handlers
 
 	mcpSrv := mcp.New(logger, metrics)

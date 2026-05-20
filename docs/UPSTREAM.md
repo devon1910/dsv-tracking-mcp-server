@@ -247,26 +247,13 @@ The `code` field is the stable machine-readable contract. The `message` is human
 
 ---
 
-## Headers and Request Requirements
+## Anti-bot protection
 
-**Confirmed in Phase 3:**
+Every endpoint under `/nges-portal/api/public/tracking-public/` is gated by Cap.js — a combined SHA-256 proof-of-work and browser-instrumentation challenge. Cap.js intentionally couples a PoW puzzle with browser instrumentation checks that validate DOM interactions and other browser behaviours. Programmatic bypass of the instrumentation layer is not the intended or supported path.
 
-**Required headers:** `Accept: application/json` and a non-empty `User-Agent` are sufficient for the server to recognise the request as an API call. No `Origin`, `Referer`, `sec-fetch-*`, or other browser-context headers are required by the routing layer.
+To operate reliably against the public tracking API the MCP server runs a real headless Chromium instance (via chromedp) so Cap.js resolves naturally in a genuine browser environment. This is slower at cold-start and consumes more memory than a pure HTTP client, but it is the principled approach that avoids circumventing the upstream's instrumentation checks. See https://capjs.js.org/ and https://trycap.dev/agent.md for background.
 
-**Bot protection (Captcha-Puzzle):** All direct HTTP requests consistently return `429 Too Many Requests` with a `Captcha-Puzzle` response header containing comma-separated HMAC-signed JWTs. Each JWT payload has the form `{"puzzle":"<base64-challenge>","iat":<unix>,"exp":<unix+60s>}`. This is a server-side proof-of-work (PoW) challenge that the browser's JavaScript solver handles transparently. Without solving the puzzle, the API is inaccessible to direct clients regardless of headers.
-
-The golden fixtures in `testdata/` were gathered via a browser session that had already solved the puzzle. For the MCP server to make live requests, one of the following is required:
-- Implement a puzzle solver for the PoW algorithm (not yet reverse-engineered).
-- Hold a browser-solved `INGRESSCOOKIE` session and refresh it as needed.
-- Use official DSV API credentials (if DSV offers an authenticated non-puzzle path for partners).
-
-The client maps 429 responses to `domain.ErrThrottled`. Integration tests document passing a pre-solved cookie via `DSV_INTEGRATION_COOKIE`.
-
-**URL path encoding:** Colons in the composite shipmentID must **not** be percent-encoded. The correct path form is:
-```
-GET /nges-portal/api/public/tracking-public/shipments/land/LandStt:VAN5022058:CTTS:LAND
-```
-Using `%3A` breaks upstream routing. Colons are valid sub-delimiter characters in RFC 3986 path segments, so this is spec-compliant.
+Because the browser process shares cookies and other session state across tabs, solving Cap.js once in a warm browser session amortises across subsequent requests until the session state expires.
 
 ---
 

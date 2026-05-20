@@ -15,8 +15,11 @@ lint:
 run: build
 	$(BINARY)
 
+run-demo:
+	go run ./cmd/demo --
+
 test-integration:
-	go test -race -tags=integration ./...
+	BROWSER_INTEGRATION=true go test -race -tags=integration -count=1 ./...
 
 clean:
 	rm -rf bin/
