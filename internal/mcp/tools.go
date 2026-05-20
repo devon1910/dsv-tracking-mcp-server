@@ -38,7 +38,7 @@ func RegisterAll(s *Server, d ToolDeps) {
 	sdkmcp.AddTool(s.sdk,
 		&sdkmcp.Tool{
 			Name: "track_shipment",
-			Description: `Search for a shipment by reference number. Use this when the user provides a tracking number, waybill number, container number, booking reference, or similar identifier and you do not yet know the internal shipment id. Returns a list of matching shipment summaries; if exactly one matches, you can immediately call get_shipment_details with its shipment_id. Currently supports LAND shipments only (DSV road freight); SEA, AIR, and RAIL are not yet covered. If the user's reference type is ambiguous (e.g. a numeric string that could be several things), pass reference_type to narrow the search — call list_reference_types first to see valid values.`,
+			Description: `Search for a shipment by reference number. Use this when the user provides a tracking number, waybill number, container number, booking reference, or similar identifier and you do not yet know the internal shipment id. Returns a list of matching shipment summaries; if exactly one matches, you can immediately call get_shipment_details with its shipment_id. Currently supports LAND shipments only (DSV road freight); SEA, AIR, and RAIL are not yet covered. If the user's reference type is ambiguous (e.g. a numeric string that could be several things), pass reference_type to narrow the search — call list_reference_types first to see valid values. Returns a list of matching shipment summaries including from/to locations, progress percentage, last event code, and start/end dates — enough signal to decide whether to immediately call get_shipment_details or surface a quick status to the user.`,
 		},
 		h.trackShipment,
 	)
@@ -46,7 +46,7 @@ func RegisterAll(s *Server, d ToolDeps) {
 	sdkmcp.AddTool(s.sdk,
 		&sdkmcp.Tool{
 			Name: "get_shipment_details",
-			Description: `Fetch full tracking detail for a known shipment. Use this after track_shipment returns a single match, or when the user provides a shipment id directly. Returns the shipment's parties (with addresses but not names — DSV's public API does not expose party names), ordered tracking events, current status, and a URL to view the shipment in DSV's web UI. Currently LAND-only.`,
+			Description: `Fetch full tracking detail for a known shipment. Returns shipment status, locations (shipper place, consignee place, collection point, delivery point, dispatching office — all at postcode/city/country level only; street addresses and party names are not exposed by DSV's public tracking endpoint), goods (weight, pieces, volume, loading meters, and dimensions when populated), the full chronological event history, and per-package events for each item in the shipment. Currently LAND-only. Use after track_shipment returns a shipment_id, or when the user provides one directly.`,
 		},
 		h.getShipmentDetails,
 	)

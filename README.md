@@ -18,7 +18,7 @@ DSV's public tracking API (`mydsv.dsv.com`) is protected by Cap.js proof-of-work
 |------|-------------|
 | `list_reference_types` | Lists the 21 reference number types DSV accepts (shipment number, container, house bill, etc.) including validation regex for each. Useful before calling `track_shipment` with an ambiguous reference. |
 | `track_shipment` | Searches by tracking reference. Returns matching shipment summaries including the `shipment_id` needed for details. Pass `reference_type` to narrow the search when the reference is ambiguous. |
-| `get_shipment_details` | Fetches full tracking detail for a known `shipment_id`: parties with addresses, ordered events, current status, and a URL to the DSV web UI. |
+| `get_shipment_details` | Returns shipment status, locations (shipper place, consignee place, collection point, delivery point, dispatching office — postcode/city/country only; street addresses and party names are not exposed by DSV's public tracking endpoint), goods (weight, pieces, volume, loading meters, and dimensions when populated), the full chronological event history, and per-package events for each item in the shipment. |
 
 **Current scope**: LAND shipments only (DSV road freight). SEA, AIR, and RAIL are not yet covered — see [ADR 0001](docs/adr/0001-land-only-launch.md).
 
@@ -119,8 +119,22 @@ See [cmd/dsv-verify/README.md](cmd/dsv-verify/README.md) for details.
 
 ## Known gaps
 
-- **SEA / AIR / RAIL**: only LAND shipments are implemented. Other modes return empty results.
-- **Party names**: DSV's public API does not expose shipper or consignee names, only addresses. See [ADR 0002](docs/adr/0002-party-name-nullable.md).
+This server uses DSV's public tracking endpoint (`mydsv.dsv.com/app/tracking-public/`),
+which is intentionally privacy-limited. The following are not available from this source:
+
+- **Party names** (shipper, consignee company names) — never exposed by the public endpoint.
+  See [ADR 0002](docs/adr/0002-party-name-nullable.md).
+- **Street addresses** — only postcode + city + country are returned. See ADR 0002.
+- **Dimensions** — the `goods.dimensions` array is empty on most shipments. When populated,
+  this server surfaces it as-is.
+- **Non-LAND transport modes** — SEA, AIR, RAIL are not currently returned by the upstream.
+  See [ADR 0001](docs/adr/0001-land-only-launch.md).
+
+These are properties of the data source, not limitations of this server. Authenticated
+DSV APIs may expose this data; integrating them is out of scope.
+
+Other operational notes:
+
 - **No streaming**: `get_shipment_details` is a one-shot call; there is no push/watch variant. See [ADR 0003](docs/adr/0003-no-streaming-tool.md).
 - **Chrome required**: the server will not start without a Chrome or Chromium binary. Distroless containers must bundle one and set `CHROMEDP_EXEC_PATH`.
 - **Cold-start latency**: the first request after startup takes 2–5 s while Cap.js is solved. Subsequent requests reuse the browser session and are typically under 3 s.

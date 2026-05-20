@@ -1,44 +1,41 @@
-# ADR 0002 — Party names omitted from domain model
+# ADR 0002 — Location shape matches public surface, not freight semantics
 
 **Status**: Accepted  
-**Date**: 2026-05-20
+**Date**: 2026-05-20 (revised 2026-05-20)
 
 ## Context
 
-DSV's public tracking API (`/api/public/tracking-public/shipments/land/...`)
-returns party records that contain addresses (city, country, postal code) but
-**no name field** for shipper, consignee, or notify party. The authenticated
-DSV portal exposes party names, but that API requires a customer login and is
-outside scope.
+DSV's tracking-public endpoint (`mydsv.dsv.com/app/tracking-public/`) is a
+deliberately privacy-limited surface. It exposes shipment-level location data
+under `shipperPlace`, `consigneePlace`, `collectFrom`, `deliverTo`, and
+`dispatchingOffice` — all at postcode/city/country level. It never exposes
+party names (shipper company, consignee company) or street addresses.
 
-Options considered:
+The Sendify challenge spec lists "sender/receiver name and address" as required
+output. This data is not available from the named source. DSV's authenticated
+APIs may expose it; they are out of scope for a public-tracking challenge.
 
-1. **Omit the `Name` field entirely** from `domain.Party` and the outbound
-   JSON. Callers receive addresses only.
-2. **Include `Name` as `*string`** (nullable). The field is always `nil` for
-   data originating from the public API but can be populated if a future
-   integration supplies names.
-3. **Include `Name` as `string`** with a sentinel like `"(not available)"`.
-   Cleaner JSON but misleads callers into thinking a name is always expected.
+Direct verification: response bodies from `GET .../shipments/land/<id>` contain
+`location.shipperPlace.postCode`, `.city`, `.countryCode`, `.country` — and
+nothing else. See `docs/evidence/sample_segot620304613.json` for the canonical
+shape.
 
 ## Decision
 
-Option 2: include `Name *string` in `domain.Party`. Rationale:
-
-- Option 1 forces a breaking schema change the day we add an authenticated
-  source; option 2 is additive.
-- Option 3 pollutes downstream text with placeholder strings that LLMs may
-  repeat verbatim.
-- The MCP tool description (`get_shipment_details`) explicitly notes "addresses
-  but not names", so callers are informed at the API contract level.
+Model the response shape after the upstream's actual fields. Use `LocationView`
+(postCode/city/countryCode/country) rather than `PartyView` (name/address).
+Surface five named locations that match the upstream's own vocabulary:
+`ShipperPlace`, `ConsigneePlace`, `CollectFrom`, `DeliverTo`,
+`DispatchingOffice`.
 
 ## Consequences
 
-- `domain.Party.Name` is `nil` for all data sourced from DSV's public tracking
-  API, because that API does not expose party names. Code that assumes it is
-  non-nil will panic; call sites must nil-check or use the view mapper which
-  handles this.
-- The pointer field reserves the option to surface names if a future
-  authenticated integration tier returns them, without a wire-format change.
-  Until such a source exists the field remains `nil` by design, not as a
-  transient state.
+- The MCP response is honest about what `tracking-public` provides. LLM callers
+  cannot promise users a street address or company name that the API doesn't
+  supply.
+- `PartyView`, `Sender`, and `Receiver` no longer exist in the view layer.
+  The `Party` domain type and `Sender()`/`Receiver()` helpers remain (they are
+  not wrong, just unused by the view).
+- Adding authenticated-tier support later requires a new `PartyView` type
+  alongside `LocationView`, not a rename — no breaking change to the current
+  wire format.
