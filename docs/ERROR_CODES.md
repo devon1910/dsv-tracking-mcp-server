@@ -72,18 +72,33 @@ string to a valid shipment_id, then call `get_shipment_details` with the result.
 ## SHIPMENT_NOT_FOUND
 
 **When it fires:** DSV's tracking API confirmed that no shipment matches the
-given reference or shipment_id.
+given reference or shipment_id. Also fires when `get_shipment_details` is called
+with a `shipment_id` that contains a typo.
 
-**Retry-worthy:** No. DSV is authoritative; retrying the same reference returns
-the same answer.
+**Retry-worthy:** No. DSV is authoritative; retrying the same input returns the
+same answer.
 
-**User-actionable:** Yes. Ask the user to double-check the reference. Common
-mistakes: leading/trailing spaces, a waybill number that has been archived, or
-a reference that belongs to a SEA/AIR shipment (not yet supported).
+**User-actionable:** Yes. Ask the user to double-check the reference or
+shipment_id. Common mistakes: leading/trailing spaces, a digit transposition in
+the STT, a wrong suffix (e.g. `LANDer` instead of `LAND`), or a reference that
+belongs to a SEA/AIR shipment (not yet supported).
 
-**Example:**
+**Typo detection:** When `get_shipment_details` detects that the STT portion is
+valid but the full composite ID doesn't match what DSV returns, the response
+includes a `details.correct_shipment_id` field with the correct value. Check for
+it and retry automatically:
+
 ```json
-{ "code": "SHIPMENT_NOT_FOUND", "message": "no shipment found for id \"LandStt:X:CTTS:LAND\"" }
+{
+  "code": "SHIPMENT_NOT_FOUND",
+  "message": "shipment_id looks like a typo — did you mean \"LandStt:SESOE620172194:CTTS:LAND\"?",
+  "details": { "correct_shipment_id": "LandStt:SESOE620172194:CTTS:LAND" }
+}
+```
+
+**Example (unknown reference):**
+```json
+{ "code": "SHIPMENT_NOT_FOUND", "message": "no shipment found — the shipment_id may contain a typo" }
 ```
 
 ---
