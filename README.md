@@ -2,6 +2,18 @@
 
 An [MCP](https://modelcontextprotocol.io/) (Model Context Protocol) server that exposes DSV's public shipment tracking API as LLM tools. Built as a Sendify code challenge submission.
 
+## See it in action
+
+**Claude Desktop** — asking "Where is waybill 3476472018?"
+
+![Claude Desktop tracking a DSV shipment](docs/screenshots/claude-desktop.png)
+
+**MCP Inspector** — all three tools listed, live search result for reference 3476230325
+
+![MCP Inspector showing tools and live response](docs/screenshots/mcp-inspector.png)
+
+---
+
 ## Requirements compliance
 
 | Requirement | Status | Notes |
