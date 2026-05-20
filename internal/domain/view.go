@@ -73,14 +73,6 @@ type LocationView struct {
 	Country     string `json:"country,omitempty"`
 }
 
-// PartyView is kept for backwards-compatibility; no longer used by ShipmentDetailView.
-type PartyView struct {
-	Name    *string `json:"name,omitempty"`
-	Address string  `json:"address,omitempty"`
-	City    string  `json:"city,omitempty"`
-	Country string  `json:"country,omitempty"`
-}
-
 // PackageEventView is a single tracking event at the individual-package level.
 type PackageEventView struct {
 	Date        string `json:"date"`
