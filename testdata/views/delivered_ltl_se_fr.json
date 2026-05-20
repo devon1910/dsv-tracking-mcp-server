@@ -86,6 +86,158 @@
       "location": "Dourges (FR)"
     }
   ],
+  "packages": [
+    {
+      "id": "573313432170044780",
+      "events": [
+        {
+          "date": "2025-12-11T23:47:00Z",
+          "code": "ENM",
+          "raw_code": "ENM",
+          "location": "Värnamo",
+          "country_code": "SE"
+        },
+        {
+          "date": "2025-12-12T05:55:00Z",
+          "code": "NLO",
+          "raw_code": "NLO",
+          "location": "Värnamo",
+          "country_code": "SE"
+        },
+        {
+          "date": "2025-12-15T23:24:00Z",
+          "code": "MAN",
+          "raw_code": "MAN",
+          "location": "Värnamo",
+          "country_code": "SE"
+        },
+        {
+          "date": "2025-12-17T08:31:00Z",
+          "code": "ENM",
+          "raw_code": "ENM",
+          "location": "Serris",
+          "country_code": "FR"
+        },
+        {
+          "date": "2025-12-17T08:31:00Z",
+          "code": "ENM",
+          "raw_code": "ENM",
+          "location": "Serris",
+          "country_code": "FR"
+        },
+        {
+          "date": "2025-12-17T09:33:00Z",
+          "code": "ENM",
+          "raw_code": "ENM",
+          "location": "Serris",
+          "country_code": "FR"
+        },
+        {
+          "date": "2025-12-17T15:53:00Z",
+          "code": "MAN",
+          "raw_code": "MAN",
+          "location": "Serris",
+          "country_code": "FR"
+        },
+        {
+          "date": "2025-12-18T04:24:00Z",
+          "code": "ENM",
+          "raw_code": "ENM",
+          "location": "Saint-Omer",
+          "country_code": "FR"
+        },
+        {
+          "date": "2025-12-18T06:05:00Z",
+          "code": "DOT",
+          "raw_code": "DOT",
+          "location": "Saint-Omer",
+          "country_code": "FR"
+        },
+        {
+          "date": "2025-12-18T10:11:00Z",
+          "code": "DLV",
+          "raw_code": "DLV",
+          "location": "Dourges",
+          "country_code": "FR"
+        }
+      ]
+    },
+    {
+      "id": "573313432170044797",
+      "events": [
+        {
+          "date": "2025-12-11T23:47:00Z",
+          "code": "ENM",
+          "raw_code": "ENM",
+          "location": "Värnamo",
+          "country_code": "SE"
+        },
+        {
+          "date": "2025-12-12T05:55:00Z",
+          "code": "NLO",
+          "raw_code": "NLO",
+          "location": "Värnamo",
+          "country_code": "SE"
+        },
+        {
+          "date": "2025-12-15T23:24:00Z",
+          "code": "MAN",
+          "raw_code": "MAN",
+          "location": "Värnamo",
+          "country_code": "SE"
+        },
+        {
+          "date": "2025-12-17T08:31:00Z",
+          "code": "ENM",
+          "raw_code": "ENM",
+          "location": "Serris",
+          "country_code": "FR"
+        },
+        {
+          "date": "2025-12-17T08:31:00Z",
+          "code": "ENM",
+          "raw_code": "ENM",
+          "location": "Serris",
+          "country_code": "FR"
+        },
+        {
+          "date": "2025-12-17T09:29:00Z",
+          "code": "ENM",
+          "raw_code": "ENM",
+          "location": "Serris",
+          "country_code": "FR"
+        },
+        {
+          "date": "2025-12-17T15:50:00Z",
+          "code": "MAN",
+          "raw_code": "MAN",
+          "location": "Serris",
+          "country_code": "FR"
+        },
+        {
+          "date": "2025-12-18T04:30:00Z",
+          "code": "ENM",
+          "raw_code": "ENM",
+          "location": "Saint-Omer",
+          "country_code": "FR"
+        },
+        {
+          "date": "2025-12-18T06:32:00Z",
+          "code": "DOT",
+          "raw_code": "DOT",
+          "location": "Saint-Omer",
+          "country_code": "FR"
+        },
+        {
+          "date": "2025-12-18T09:09:00Z",
+          "code": "DLV",
+          "raw_code": "DLV",
+          "location": "Dourges",
+          "country_code": "FR"
+        }
+      ]
+    }
+  ],
   "goods": {
     "pieces": 2,
     "weight": {

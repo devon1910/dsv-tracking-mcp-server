@@ -23,6 +23,20 @@
       "location": "Linköping (SE)"
     }
   ],
+  "packages": [
+    {
+      "id": "573313432228984471",
+      "events": []
+    },
+    {
+      "id": "573313432228984488",
+      "events": []
+    },
+    {
+      "id": "573313432228984495",
+      "events": []
+    }
+  ],
   "goods": {
     "pieces": 3,
     "weight": {

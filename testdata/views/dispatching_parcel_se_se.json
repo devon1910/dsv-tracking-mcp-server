@@ -58,6 +58,41 @@
       "location": "Karlstad (SE)"
     }
   ],
+  "packages": [
+    {
+      "id": "573313432229005939",
+      "events": [
+        {
+          "date": "2026-05-15T14:00:00Z",
+          "code": "COL",
+          "raw_code": "COL",
+          "location": "Karlstad",
+          "country_code": "SE"
+        },
+        {
+          "date": "2026-05-15T14:01:00Z",
+          "code": "ENM",
+          "raw_code": "ENM",
+          "location": "Karlstad",
+          "country_code": "SE"
+        },
+        {
+          "date": "2026-05-15T16:15:00Z",
+          "code": "MAN",
+          "raw_code": "MAN",
+          "location": "Karlstad",
+          "country_code": "SE"
+        },
+        {
+          "date": "2026-05-18T04:40:00Z",
+          "code": "ENM",
+          "raw_code": "ENM",
+          "location": "Karlstad",
+          "country_code": "SE"
+        }
+      ]
+    }
+  ],
   "goods": {
     "pieces": 1,
     "weight": {

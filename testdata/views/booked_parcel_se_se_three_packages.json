@@ -23,6 +23,20 @@
       "location": "Stockholm (SE)"
     }
   ],
+  "packages": [
+    {
+      "id": "573313432229014382",
+      "events": []
+    },
+    {
+      "id": "573313432229014405",
+      "events": []
+    },
+    {
+      "id": "573313432229014412",
+      "events": []
+    }
+  ],
   "goods": {
     "pieces": 3,
     "weight": {

@@ -23,6 +23,12 @@
       "location": "Göteborg (SE)"
     }
   ],
+  "packages": [
+    {
+      "id": "573313432229223401",
+      "events": []
+    }
+  ],
   "goods": {
     "pieces": 1,
     "weight": {

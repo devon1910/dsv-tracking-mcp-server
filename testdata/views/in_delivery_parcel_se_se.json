@@ -58,6 +58,41 @@
       "location": "Skara (SE)"
     }
   ],
+  "packages": [
+    {
+      "id": "573313432228927539",
+      "events": [
+        {
+          "date": "2026-05-15T14:00:00Z",
+          "code": "COL",
+          "raw_code": "COL",
+          "location": "Järfälla",
+          "country_code": "SE"
+        },
+        {
+          "date": "2026-05-15T14:01:00Z",
+          "code": "ENM",
+          "raw_code": "ENM",
+          "location": "Stockholm",
+          "country_code": "SE"
+        },
+        {
+          "date": "2026-05-15T15:51:00Z",
+          "code": "MAN",
+          "raw_code": "MAN",
+          "location": "Stockholm",
+          "country_code": "SE"
+        },
+        {
+          "date": "2026-05-18T01:39:00Z",
+          "code": "ENM",
+          "raw_code": "ENM",
+          "location": "Skara",
+          "country_code": "SE"
+        }
+      ]
+    }
+  ],
   "goods": {
     "pieces": 1,
     "weight": {

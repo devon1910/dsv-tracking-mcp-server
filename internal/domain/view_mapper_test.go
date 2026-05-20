@@ -177,6 +177,42 @@ func TestViewMapper_GoodsNullMeasurementOmitted(t *testing.T) {
 	}
 }
 
+func TestViewMapper_PackagesAlwaysSlice(t *testing.T) {
+	s := loadDetailShipment(t, "booked_parcel_se_se_simple.json")
+	view := domain.MapShipmentDetailView(s)
+	if view.Packages == nil {
+		t.Fatal("Packages is nil, want empty slice []")
+	}
+	if len(view.Packages) != 1 {
+		t.Errorf("len(Packages) = %d, want 1", len(view.Packages))
+	}
+	if view.Packages[0].Events == nil {
+		t.Fatal("Package.Events is nil, want empty slice []")
+	}
+}
+
+func TestViewMapper_PackageEventsAscending(t *testing.T) {
+	s := loadDetailShipment(t, "in_delivery_parcel_se_se.json")
+	view := domain.MapShipmentDetailView(s)
+	if len(view.Packages) == 0 {
+		t.Fatal("expected packages")
+	}
+	evts := view.Packages[0].Events
+	for i := 1; i < len(evts); i++ {
+		if evts[i].Date < evts[i-1].Date {
+			t.Errorf("package events not sorted: [%d]=%s > [%d]=%s", i-1, evts[i-1].Date, i, evts[i].Date)
+		}
+	}
+}
+
+func TestViewMapper_ThreePackages(t *testing.T) {
+	s := loadDetailShipment(t, "booked_parcel_se_se_three_packages.json")
+	view := domain.MapShipmentDetailView(s)
+	if len(view.Packages) != 3 {
+		t.Errorf("len(Packages) = %d, want 3", len(view.Packages))
+	}
+}
+
 func TestViewMapper_UnknownEventCodePreservesRawCode(t *testing.T) {
 	var dto dsv.ShipmentDetailDTO
 	raw := []byte(`{

@@ -47,9 +47,10 @@ type ShipmentDetailView struct {
 	DataProvider  string      `json:"data_provider"`
 	Sender        *PartyView  `json:"sender,omitempty"`
 	Receiver      *PartyView  `json:"receiver,omitempty"`
-	Events        []EventView `json:"events"`
-	Goods         *GoodsView  `json:"goods,omitempty"`
-	ViewInUIURL   string      `json:"view_in_ui_url,omitempty"`
+	Events        []EventView   `json:"events"`
+	Packages      []PackageView `json:"packages"`
+	Goods         *GoodsView    `json:"goods,omitempty"`
+	ViewInUIURL   string        `json:"view_in_ui_url,omitempty"`
 }
 
 // PartyView represents a sender or receiver.
@@ -63,6 +64,21 @@ type PartyView struct {
 	Address string  `json:"address,omitempty"`
 	City    string  `json:"city,omitempty"`
 	Country string  `json:"country,omitempty"`
+}
+
+// PackageEventView is a single tracking event at the individual-package level.
+type PackageEventView struct {
+	Date        string `json:"date"`
+	Code        string `json:"code"`
+	RawCode     string `json:"raw_code"`
+	Location    string `json:"location,omitempty"`
+	CountryCode string `json:"country_code,omitempty"`
+}
+
+// PackageView holds per-package tracking history.
+type PackageView struct {
+	ID     string             `json:"id"`
+	Events []PackageEventView `json:"events"`
 }
 
 // EventView is a single tracking event in a shipment's history.

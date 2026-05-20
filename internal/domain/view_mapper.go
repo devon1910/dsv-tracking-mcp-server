@@ -37,6 +37,7 @@ func MapShipmentDetailView(s Shipment) ShipmentDetailView {
 		Sender:        &sender,
 		Receiver:      &receiver,
 		Events:        events,
+		Packages:      mapPackagesView(s.Packages),
 		Goods:         mapGoodsView(s.Goods),
 		ViewInUIURL:   viewInUIURL(s.ShipmentID),
 	}
@@ -56,6 +57,24 @@ func mapEventView(e Event) EventView {
 		Description: e.Code.Description(),
 		Location:    loc,
 	}
+}
+
+func mapPackagesView(pkgs []Package) []PackageView {
+	views := make([]PackageView, len(pkgs))
+	for i, p := range pkgs {
+		evts := make([]PackageEventView, len(p.Events))
+		for j, e := range p.Events {
+			evts[j] = PackageEventView{
+				Date:        e.Date.UTC().Format(time.RFC3339),
+				Code:        string(e.Code),
+				RawCode:     e.RawCode,
+				Location:    e.Location,
+				CountryCode: e.CountryCode,
+			}
+		}
+		views[i] = PackageView{ID: p.ID, Events: evts}
+	}
+	return views
 }
 
 func mapMeasurementView(m Measurement) *MeasurementView {
