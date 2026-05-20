@@ -234,32 +234,35 @@ func (b *Browser) FetchJSON(ctx context.Context, pageURL, xhrSubstring string) (
 }
 
 // FetchDetailJSON navigates once and watches both the search XHR and the detail
-// XHR — mirroring DSV's own frontend which fires them in sequence on the same
-// page load. If the search XHR returns 4xx the detail XHR will never fire;
-// FetchDetailJSON short-circuits with ErrShipmentNotFound rather than waiting
-// for the XHR timeout. If both fire successfully it returns the detail body.
+// XHR in the same tab — mirroring DSV's own frontend which fires them in
+// sequence on a single page load.
 //
-// searchSubstring must match the search XHR URL; detailSubstring must match
-// the detail XHR URL. Both are expected to fire during a single navigation.
+// The search XHR is used only for fail-fast not-found detection: a 404 means
+// the shipment doesn't exist and the detail XHR will never fire. A 429 on
+// the search XHR is ignored — it is Cap.js issuing a challenge; the browser
+// will solve it and the XHR will retry. All other search statuses are ignored;
+// we wait for the detail XHR regardless.
 func (b *Browser) FetchDetailJSON(ctx context.Context, pageURL, searchSubstring, detailSubstring string) ([]byte, error) {
 	start := time.Now()
 
 	tabCtx, tabCancel := chromedp.NewContext(b.browserCtx)
 	defer tabCancel()
 
-	type xhrResult struct {
-		body   []byte
-		status int
-		isDetail bool // false = search pre-check, true = detail response
+	type signal struct {
+		body      []byte
+		status    int
+		notFound  bool // search XHR returned 404 — detail will never fire
 	}
-	resCh := make(chan xhrResult, 2)
+	resCh := make(chan signal, 1)
 
 	var (
-		mu              sync.Mutex
-		searchReqID     network.RequestID
-		searchStatus    int
-		detailReqID     network.RequestID
-		detailStatus    int
+		mu            sync.Mutex
+		detailReqID   network.RequestID
+		detailStatus  int
+		// searchReqID tracks the most-recent search request; reset on each new
+		// ResponseReceived so Cap.js retries (same URL, new request) are captured.
+		searchReqID   network.RequestID
+		searchStatus  int
 	)
 
 	chromedp.ListenTarget(tabCtx, func(ev interface{}) {
@@ -269,13 +272,16 @@ func (b *Browser) FetchDetailJSON(ctx context.Context, pageURL, searchSubstring,
 				return
 			}
 			url := e.Response.URL
+			status := int(e.Response.Status)
 			mu.Lock()
-			if strings.Contains(url, searchSubstring) && searchReqID == "" {
-				searchReqID = e.RequestID
-				searchStatus = int(e.Response.Status)
-			} else if strings.Contains(url, detailSubstring) && detailReqID == "" {
+			switch {
+			case strings.Contains(url, detailSubstring) && detailReqID == "":
 				detailReqID = e.RequestID
-				detailStatus = int(e.Response.Status)
+				detailStatus = status
+			case strings.Contains(url, searchSubstring):
+				// Always update: Cap.js may re-fire the same URL with a new requestID.
+				searchReqID = e.RequestID
+				searchStatus = status
 			}
 			mu.Unlock()
 
@@ -292,38 +298,36 @@ func (b *Browser) FetchDetailJSON(ctx context.Context, pageURL, searchSubstring,
 			executor := cdp.WithExecutor(context.Background(), chromedpCtx.Target)
 
 			switch e.RequestID {
-			case sID:
-				if sID == "" {
-					return
-				}
-				go func(rID network.RequestID, status int) {
-					body, err := network.GetResponseBody(rID).Do(executor)
-					if err != nil {
-						return
-					}
-					select {
-					case resCh <- xhrResult{body: body, status: status, isDetail: false}:
-					default:
-					}
-				}(sID, sStatus)
-
 			case dID:
 				if dID == "" {
 					return
 				}
 				go func(rID network.RequestID, status int) {
 					body, err := network.GetResponseBody(rID).Do(executor)
-					if err != nil {
-						return
-					}
-					if len(body) == 0 {
+					if err != nil || len(body) == 0 {
 						return
 					}
 					select {
-					case resCh <- xhrResult{body: body, status: status, isDetail: true}:
+					case resCh <- signal{body: body, status: status}:
 					default:
 					}
 				}(dID, dStatus)
+
+			case sID:
+				// Only act on search if it is a definitive 404 — the shipment
+				// does not exist and the detail XHR will never fire.
+				// 429 = Cap.js challenge in progress; ignore and wait.
+				// 200 = search succeeded; detail XHR will fire shortly; ignore.
+				if sID == "" || sStatus != 404 {
+					return
+				}
+				go func(rID network.RequestID, status int) {
+					body, _ := network.GetResponseBody(rID).Do(executor)
+					select {
+					case resCh <- signal{body: body, status: status, notFound: true}:
+					default:
+					}
+				}(sID, sStatus)
 			}
 		}
 	})
@@ -344,36 +348,23 @@ func (b *Browser) FetchDetailJSON(ctx context.Context, pageURL, searchSubstring,
 	xhrTimer := time.NewTimer(b.xhrTO)
 	defer xhrTimer.Stop()
 
-	// Collect results. We may receive search before detail; we need both
-	// (search to validate, detail for the body). Short-circuit if search is 4xx.
-	searchOK := false
-	for {
-		select {
-		case r := <-resCh:
-			if !r.isDetail {
-				// Search XHR received.
-				if r.status >= 400 {
-					b.recordMetrics(searchSubstring, fmt.Sprintf("%d", r.status), time.Since(start))
-					return nil, mapErrorResponse(r.status, r.body)
-				}
-				searchOK = true
-			} else {
-				// Detail XHR received.
-				b.recordMetrics(detailSubstring, fmt.Sprintf("%d", r.status), time.Since(start))
-				if r.status >= 400 {
-					return nil, mapErrorResponse(r.status, r.body)
-				}
-				return r.body, nil
-			}
-			_ = searchOK // used implicitly: if search was 4xx we already returned
-
-		case <-xhrTimer.C:
-			b.recordMetrics(detailSubstring, "timeout", time.Since(start))
-			return nil, &domain.UpstreamError{Op: "browser_fetch", Err: domain.ErrUpstreamUnavailable}
-
-		case <-ctx.Done():
-			return nil, &domain.UpstreamError{Op: "browser_fetch", Err: domain.ErrUpstreamUnavailable}
+	select {
+	case r := <-resCh:
+		b.recordMetrics(detailSubstring, fmt.Sprintf("%d", r.status), time.Since(start))
+		if r.notFound {
+			return nil, &domain.UpstreamError{Op: "browser_fetch", HTTPStatus: r.status, Err: domain.ErrShipmentNotFound}
 		}
+		if r.status >= 400 {
+			return nil, mapErrorResponse(r.status, r.body)
+		}
+		return r.body, nil
+
+	case <-xhrTimer.C:
+		b.recordMetrics(detailSubstring, "timeout", time.Since(start))
+		return nil, &domain.UpstreamError{Op: "browser_fetch", Err: domain.ErrUpstreamUnavailable}
+
+	case <-ctx.Done():
+		return nil, &domain.UpstreamError{Op: "browser_fetch", Err: domain.ErrUpstreamUnavailable}
 	}
 }
 
