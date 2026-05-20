@@ -3,8 +3,6 @@ package mcp
 import (
 	"context"
 	"encoding/json"
-	"errors"
-	"fmt"
 	"log/slog"
 	"strings"
 	"time"
@@ -112,18 +110,15 @@ func (h *toolHandlers) trackShipment(
 
 	if ref == "" {
 		h.record("track_shipment", "invalid_input", start)
-		return nil, trackShipmentOutput{}, toolErr("INVALID_INPUT", "reference is required after trimming whitespace", nil)
+		return nil, trackShipmentOutput{}, errInvalidInput("reference", "must be non-empty")
 	}
 
 	var refType string
 	if in.ReferenceType != nil {
 		rt := strings.TrimSpace(*in.ReferenceType)
 		if _, ok := h.refTypeCodes[rt]; !ok {
-			codes := h.validRefTypeCodes()
 			h.record("track_shipment", "invalid_reference_type", start)
-			return nil, trackShipmentOutput{}, toolErr("INVALID_REFERENCE_TYPE",
-				fmt.Sprintf("%q is not a valid reference_type", rt),
-				map[string]any{"valid_codes": codes})
+			return nil, trackShipmentOutput{}, errInvalidReferenceType(rt, h.validRefTypeCodes())
 		}
 		refType = rt
 	}
@@ -135,7 +130,7 @@ func (h *toolHandlers) trackShipment(
 	})
 	if err != nil {
 		h.record("track_shipment", "upstream_error", start)
-		return nil, trackShipmentOutput{}, toolErr("UPSTREAM_ERROR", err.Error(), nil)
+		return nil, trackShipmentOutput{}, errFromUpstream(err)
 	}
 
 	views := make([]domain.ShipmentSummaryView, len(resp.Data))
@@ -161,23 +156,16 @@ func (h *toolHandlers) getShipmentDetails(
 
 	if !validShipmentID(sid) {
 		h.record("get_shipment_details", "invalid_shipment_id", start)
-		return nil, getShipmentDetailsOutput{}, toolErr("INVALID_SHIPMENT_ID",
-			"shipment_id must have the form Provider:Ref:DataProvider:Mode (e.g. LandStt:VAN5022058:CTTS:LAND)",
-			map[string]any{"received": sid})
+		return nil, getShipmentDetailsOutput{}, errInvalidShipmentID(sid)
 	}
 
 	resp, err := h.deps.DetailCache.Fetch(ctx, sid, func(ctx context.Context) (domain.Shipment, error) {
 		return h.deps.Upstream.Detail(ctx, sid)
 	})
 	if err != nil {
-		// Map ErrShipmentNotFound to a user-actionable MCP error code.
-		if errors.Is(err, domain.ErrShipmentNotFound) {
-			h.record("get_shipment_details", "not_found", start)
-			return nil, getShipmentDetailsOutput{}, toolErr("SHIPMENT_NOT_FOUND",
-				fmt.Sprintf("no shipment found for id %q", sid), nil)
-		}
-		h.record("get_shipment_details", "upstream_error", start)
-		return nil, getShipmentDetailsOutput{}, toolErr("UPSTREAM_ERROR", err.Error(), nil)
+		te := errFromUpstream(err)
+		h.record("get_shipment_details", string(te.Code), start)
+		return nil, getShipmentDetailsOutput{}, te
 	}
 
 	h.record("get_shipment_details", "success", start)
@@ -195,7 +183,7 @@ func (h *toolHandlers) listReferenceTypes(
 ) (*sdkmcp.CallToolResult, listReferenceTypesOutput, error) {
 	var types []domain.ReferenceTypeView
 	if err := json.Unmarshal(data.ReferenceTypesJSON, &types); err != nil {
-		return nil, listReferenceTypesOutput{}, toolErr("INTERNAL_ERROR", "failed to load reference types", nil)
+		return nil, listReferenceTypesOutput{}, errInternal("failed to load reference types")
 	}
 	return nil, listReferenceTypesOutput{
 		ReferenceTypes: types,
@@ -204,24 +192,6 @@ func (h *toolHandlers) listReferenceTypes(
 }
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
-
-// toolError is a structured MCP tool error. When returned as a Go error from a
-// typed handler, the SDK wraps it into CallToolResult{IsError: true} with the
-// JSON-encoded message in TextContent.
-type toolError struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-	Details any    `json:"details,omitempty"`
-}
-
-func (e *toolError) Error() string {
-	b, _ := json.Marshal(e)
-	return string(b)
-}
-
-func toolErr(code, msg string, details any) *toolError {
-	return &toolError{Code: code, Message: msg, Details: details}
-}
 
 func validShipmentID(id string) bool {
 	parts := strings.Split(id, ":")
