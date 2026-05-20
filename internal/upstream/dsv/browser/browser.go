@@ -2,6 +2,7 @@ package browser
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"os"
@@ -218,13 +219,8 @@ func (b *Browser) FetchJSON(ctx context.Context, pageURL, xhrSubstring string) (
 			slog.Int("status", r.status),
 			slog.Int("bytes", len(r.body)),
 		)
-		switch {
-		case r.status == 400:
-			return nil, &domain.UpstreamError{Op: "browser_fetch", HTTPStatus: r.status, Err: domain.ErrShipmentNotFound}
-		case r.status >= 400 && r.status < 500:
-			return nil, &domain.UpstreamError{Op: "browser_fetch", HTTPStatus: r.status, Err: domain.ErrInvalidReference}
-		case r.status >= 500:
-			return nil, &domain.UpstreamError{Op: "browser_fetch", HTTPStatus: r.status, Err: domain.ErrUpstreamUnavailable}
+		if r.status >= 400 {
+			return nil, mapErrorResponse(r.status, r.body)
 		}
 		return r.body, nil
 
@@ -243,6 +239,41 @@ func (b *Browser) Close() error {
 	b.allocCancel()
 	b.logger.Info("browser shut down")
 	return nil
+}
+
+// mapErrorResponse converts a 4xx/5xx XHR response to a domain.UpstreamError.
+// It parses the upstream error body to extract the machine-readable code so
+// callers can match on ErrShipmentNotFound via errors.Is.
+func mapErrorResponse(status int, body []byte) *domain.UpstreamError {
+	var upstreamCode string
+	if len(body) > 0 {
+		var errBody struct {
+			Code string `json:"code"`
+		}
+		if err := json.Unmarshal(body, &errBody); err == nil {
+			upstreamCode = errBody.Code
+		}
+	}
+
+	var sentinel error
+	switch {
+	case upstreamCode == "TRACKING-BADREQ-SHIPMENT_NOT_FOUND" || status == 404:
+		sentinel = domain.ErrShipmentNotFound
+	case status == 400:
+		sentinel = domain.ErrInvalidReference
+	case status == 429:
+		sentinel = domain.ErrThrottled
+	case status >= 500:
+		sentinel = domain.ErrUpstreamUnavailable
+	default:
+		sentinel = domain.ErrInvalidReference
+	}
+	return &domain.UpstreamError{
+		Op:           "browser_fetch",
+		UpstreamCode: upstreamCode,
+		HTTPStatus:   status,
+		Err:          sentinel,
+	}
 }
 
 // buildAllocatorOptions assembles the chromedp ExecAllocator option list.
