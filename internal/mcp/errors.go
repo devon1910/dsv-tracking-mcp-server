@@ -87,8 +87,9 @@ func errFromUpstream(err error) *ToolError {
 	switch {
 	case errors.Is(err, context.DeadlineExceeded):
 		return &ToolError{Code: CodeUpstreamTimeout, Message: "browser fetch exceeded deadline"}
-	case errors.Is(err, domain.ErrShipmentNotFound):
-		return &ToolError{Code: CodeShipmentNotFound, Message: err.Error()}
+	case errors.Is(err, domain.ErrShipmentNotFound),
+		errors.Is(err, domain.ErrInvalidReference):
+		return &ToolError{Code: CodeShipmentNotFound, Message: "no shipment found for that reference"}
 	case errors.Is(err, domain.ErrUpstreamUnavailable):
 		return &ToolError{
 			Code:    CodeUpstreamUnavailable,
