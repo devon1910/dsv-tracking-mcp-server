@@ -3,6 +3,7 @@ package mcp
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"strings"
@@ -170,7 +171,7 @@ func (h *toolHandlers) getShipmentDetails(
 	})
 	if err != nil {
 		// Map ErrShipmentNotFound to a user-actionable MCP error code.
-		if isShipmentNotFound(err) {
+		if errors.Is(err, domain.ErrShipmentNotFound) {
 			h.record("get_shipment_details", "not_found", start)
 			return nil, getShipmentDetailsOutput{}, toolErr("SHIPMENT_NOT_FOUND",
 				fmt.Sprintf("no shipment found for id %q", sid), nil)
@@ -235,13 +236,6 @@ func validShipmentID(id string) bool {
 	return true
 }
 
-func isShipmentNotFound(err error) bool {
-	if err == nil {
-		return false
-	}
-	return strings.Contains(err.Error(), "shipment not found") ||
-		strings.Contains(err.Error(), "ErrShipmentNotFound")
-}
 
 func (h *toolHandlers) record(tool, outcome string, start time.Time) {
 	if h.deps.Metrics == nil {

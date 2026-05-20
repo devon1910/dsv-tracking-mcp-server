@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wsl -d Ubuntu sh -c \"/usr/local/go/bin/go version\")",
+      "PowerShell(wsl -d Ubuntu --exec /usr/local/go/bin/go version)",
+      "PowerShell(wsl -d Ubuntu --exec ls /usr/local/go/bin/)",
+      "PowerShell(wsl -d Ubuntu --exec ls /usr/local/go/bin/ 2>&1)"
+    ]
+  }
+}
