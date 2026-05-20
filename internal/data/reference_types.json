@@ -1,0 +1,23 @@
+[
+  {"code": "Stt",                    "label": "Shipment tracking number",      "pattern": "^[A-Z]{2,8}\\d{5,12}$"},
+  {"code": "WaybillNo",              "label": "Waybill number",                "pattern": "^\\d{7,12}$"},
+  {"code": "ShippersRefNo",          "label": "Shipper's reference number",    "pattern": "^\\S.{0,99}$"},
+  {"code": "PackageId",              "label": "Package ID",                    "pattern": "^\\d{15,20}$"},
+  {"code": "ConsigneesRefNo",        "label": "Consignee's reference number",  "pattern": "^\\S.{0,99}$"},
+  {"code": "Hawb",                   "label": "House air waybill",             "pattern": "^\\S.{0,99}$"},
+  {"code": "BookingId",              "label": "Booking ID",                    "pattern": "^\\S.{0,99}$"},
+  {"code": "CustomerBookingRef",     "label": "Customer booking reference",    "pattern": "^\\S.{0,99}$"},
+  {"code": "PurchaseOrderNo",        "label": "Purchase order number",         "pattern": "^\\S.{0,99}$"},
+  {"code": "Hbl",                    "label": "House bill of lading",          "pattern": "^\\S.{0,99}$"},
+  {"code": "ContainerNo",            "label": "Container number",              "pattern": "^[A-Z]{4}\\d{7}$"},
+  {"code": "ATOL",                   "label": "ATOL reference",                "pattern": "^\\S.{0,99}$"},
+  {"code": "COS",                    "label": "COS reference",                 "pattern": "^\\S.{0,99}$"},
+  {"code": "ShippingOrderNumber",    "label": "Shipping order number",         "pattern": "^\\S.{0,99}$"},
+  {"code": "MovementReferenceNumber","label": "Movement reference number",     "pattern": "^\\d{14}$"},
+  {"code": "ShipmentNoExportImport", "label": "Shipment number (export/import)","pattern": "^\\S.{0,99}$"},
+  {"code": "SalesOrderNumber",       "label": "Sales order number",            "pattern": "^\\S.{0,99}$"},
+  {"code": "DeliveryOrderNumber",    "label": "Delivery order number",         "pattern": "^\\S.{0,99}$"},
+  {"code": "PackageNumber",          "label": "Package number",                "pattern": "^\\S.{0,99}$"},
+  {"code": "AssetId",                "label": "Asset ID",                      "pattern": "^\\S.{0,99}$"},
+  {"code": "JobId",                  "label": "Job ID",                        "pattern": "^\\S.{0,99}$"}
+]

@@ -1,0 +1,27 @@
+{
+  "shipment_id": "LandStt:SESTO620298049:CTTS:LAND",
+  "reference": "SESTO620298049",
+  "status": "Booked",
+  "transport_mode": "LAND",
+  "data_provider": "CTTS",
+  "sender": {
+    "address": "17562 Järfälla",
+    "city": "Järfälla",
+    "country": "Sweden"
+  },
+  "receiver": {
+    "address": "19492 Upplands väsby",
+    "city": "Upplands väsby",
+    "country": "Sweden"
+  },
+  "events": [
+    {
+      "date": "2026-05-15T15:44:00Z",
+      "code": "ENT",
+      "raw_code": "ENT",
+      "description": "Booked",
+      "location": "Stockholm (SE)"
+    }
+  ],
+  "view_in_ui_url": "https://mydsv.dsv.com/app/tracking-public/?refNumber=SESTO620298049"
+}

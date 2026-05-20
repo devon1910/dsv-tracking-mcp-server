@@ -1,0 +1,62 @@
+{
+  "shipment_id": "LandStt:SESTO620296604:CTTS:LAND",
+  "reference": "SESTO620296604",
+  "status": "Out for delivery",
+  "transport_mode": "LAND",
+  "data_provider": "CTTS",
+  "sender": {
+    "address": "17562 Järfälla",
+    "city": "Järfälla",
+    "country": "Sweden"
+  },
+  "receiver": {
+    "address": "52151 Floby",
+    "city": "Floby",
+    "country": "Sweden"
+  },
+  "events": [
+    {
+      "date": "2026-05-15T13:12:00Z",
+      "code": "ENT",
+      "raw_code": "ENT",
+      "description": "Booked",
+      "location": "Stockholm (SE)"
+    },
+    {
+      "date": "2026-05-15T14:00:00Z",
+      "code": "COL",
+      "raw_code": "COL",
+      "description": "Collected",
+      "location": "Järfälla (SE)"
+    },
+    {
+      "date": "2026-05-15T14:01:00Z",
+      "code": "ENM",
+      "raw_code": "ENM",
+      "description": "Arrived at hub",
+      "location": "Stockholm (SE)"
+    },
+    {
+      "date": "2026-05-15T15:51:00Z",
+      "code": "MAN",
+      "raw_code": "MAN",
+      "description": "Departed",
+      "location": "Stockholm (SE)"
+    },
+    {
+      "date": "2026-05-18T01:39:00Z",
+      "code": "ENM",
+      "raw_code": "ENM",
+      "description": "Arrived at hub",
+      "location": "Skara (SE)"
+    },
+    {
+      "date": "2026-05-18T06:54:00Z",
+      "code": "DOT",
+      "raw_code": "DOT",
+      "description": "Out for delivery",
+      "location": "Skara (SE)"
+    }
+  ],
+  "view_in_ui_url": "https://mydsv.dsv.com/app/tracking-public/?refNumber=SESTO620296604"
+}

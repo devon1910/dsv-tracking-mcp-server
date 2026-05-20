@@ -1,0 +1,90 @@
+{
+  "shipment_id": "LandStt:VAN5022058:CTTS:LAND",
+  "reference": "VAN5022058",
+  "status": "Delivered",
+  "transport_mode": "LAND",
+  "data_provider": "CTTS",
+  "sender": {
+    "address": "46178 Sjuntorp",
+    "city": "Sjuntorp",
+    "country": "Sweden"
+  },
+  "receiver": {
+    "address": "62119 Dourges",
+    "city": "Dourges",
+    "country": "France"
+  },
+  "events": [
+    {
+      "date": "2025-12-11T07:22:00Z",
+      "code": "ENT",
+      "raw_code": "ENT",
+      "description": "Booked",
+      "location": "Vänersborg (SE)"
+    },
+    {
+      "date": "2025-12-11T14:50:00Z",
+      "code": "COL",
+      "raw_code": "COL",
+      "description": "Collected",
+      "location": "Sjuntorp (SE)"
+    },
+    {
+      "date": "2025-12-11T22:00:00Z",
+      "code": "ENM",
+      "raw_code": "ENM",
+      "description": "Arrived at hub",
+      "location": "Värnamo (SE)"
+    },
+    {
+      "date": "2025-12-11T23:47:00Z",
+      "code": "ENM",
+      "raw_code": "ENM",
+      "description": "Arrived at hub",
+      "location": "Värnamo (SE)"
+    },
+    {
+      "date": "2025-12-15T23:24:00Z",
+      "code": "MAN",
+      "raw_code": "MAN",
+      "description": "Departed",
+      "location": "Värnamo (SE)"
+    },
+    {
+      "date": "2025-12-17T08:31:00Z",
+      "code": "ENM",
+      "raw_code": "ENM",
+      "description": "Arrived at hub",
+      "location": "Serris (FR)"
+    },
+    {
+      "date": "2025-12-17T21:00:00Z",
+      "code": "MAN",
+      "raw_code": "MAN",
+      "description": "Departed",
+      "location": "Serris (FR)"
+    },
+    {
+      "date": "2025-12-18T04:30:00Z",
+      "code": "ENM",
+      "raw_code": "ENM",
+      "description": "Arrived at hub",
+      "location": "Saint-Omer (FR)"
+    },
+    {
+      "date": "2025-12-18T07:20:00Z",
+      "code": "DOT",
+      "raw_code": "DOT",
+      "description": "Out for delivery",
+      "location": "Saint-Omer (FR)"
+    },
+    {
+      "date": "2025-12-18T10:11:00Z",
+      "code": "DLV",
+      "raw_code": "DLV",
+      "description": "Delivered",
+      "location": "Dourges (FR)"
+    }
+  ],
+  "view_in_ui_url": "https://mydsv.dsv.com/app/tracking-public/?refNumber=VAN5022058"
+}

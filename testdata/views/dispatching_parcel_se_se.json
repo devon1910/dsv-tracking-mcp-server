@@ -1,0 +1,62 @@
+{
+  "shipment_id": "LandStt:SEKSD620143489:CTTS:LAND",
+  "reference": "SEKSD620143489",
+  "status": "At dispatching centre",
+  "transport_mode": "LAND",
+  "data_provider": "CTTS",
+  "sender": {
+    "address": "65221 Karlstad",
+    "city": "Karlstad",
+    "country": "Sweden"
+  },
+  "receiver": {
+    "address": "67191 Arvika",
+    "city": "Arvika",
+    "country": "Sweden"
+  },
+  "events": [
+    {
+      "date": "2026-05-15T14:00:00Z",
+      "code": "COL",
+      "raw_code": "COL",
+      "description": "Collected",
+      "location": "Karlstad (SE)"
+    },
+    {
+      "date": "2026-05-15T14:01:00Z",
+      "code": "ENM",
+      "raw_code": "ENM",
+      "description": "Arrived at hub",
+      "location": "Karlstad (SE)"
+    },
+    {
+      "date": "2026-05-15T15:24:00Z",
+      "code": "ENT",
+      "raw_code": "ENT",
+      "description": "Booked",
+      "location": "Karlstad (SE)"
+    },
+    {
+      "date": "2026-05-15T16:15:00Z",
+      "code": "MAN",
+      "raw_code": "MAN",
+      "description": "Departed",
+      "location": "Karlstad (SE)"
+    },
+    {
+      "date": "2026-05-15T16:20:00Z",
+      "code": "DIS",
+      "raw_code": "DIS",
+      "description": "To consignee's disposal",
+      "location": "Karlstad (SE)"
+    },
+    {
+      "date": "2026-05-18T04:40:00Z",
+      "code": "ENM",
+      "raw_code": "ENM",
+      "description": "Arrived at hub",
+      "location": "Karlstad (SE)"
+    }
+  ],
+  "view_in_ui_url": "https://mydsv.dsv.com/app/tracking-public/?refNumber=SEKSD620143489"
+}

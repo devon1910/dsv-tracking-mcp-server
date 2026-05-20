@@ -1,0 +1,27 @@
+{
+  "shipment_id": "LandStt:SEGOT620304613:CTTS:LAND",
+  "reference": "SEGOT620304613",
+  "status": "Booked",
+  "transport_mode": "LAND",
+  "data_provider": "CTTS",
+  "sender": {
+    "address": "44240 Kungälv",
+    "city": "Kungälv",
+    "country": "Sweden"
+  },
+  "receiver": {
+    "address": "43974 Fjärås",
+    "city": "Fjärås",
+    "country": "Sweden"
+  },
+  "events": [
+    {
+      "date": "2026-05-16T11:38:00Z",
+      "code": "ENT",
+      "raw_code": "ENT",
+      "description": "Booked",
+      "location": "Göteborg (SE)"
+    }
+  ],
+  "view_in_ui_url": "https://mydsv.dsv.com/app/tracking-public/?refNumber=SEGOT620304613"
+}

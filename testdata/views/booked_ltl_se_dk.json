@@ -1,0 +1,27 @@
+{
+  "shipment_id": "LandStt:LKG6022524:CTTS:LAND",
+  "reference": "LKG6022524",
+  "status": "Booked",
+  "transport_mode": "LAND",
+  "data_provider": "CTTS",
+  "sender": {
+    "address": "58941 Linköping",
+    "city": "Linköping",
+    "country": "Sweden"
+  },
+  "receiver": {
+    "address": "7800 Skive",
+    "city": "Skive",
+    "country": "Denmark"
+  },
+  "events": [
+    {
+      "date": "2026-05-15T15:32:00Z",
+      "code": "ENT",
+      "raw_code": "ENT",
+      "description": "Booked",
+      "location": "Linköping (SE)"
+    }
+  ],
+  "view_in_ui_url": "https://mydsv.dsv.com/app/tracking-public/?refNumber=LKG6022524"
+}
