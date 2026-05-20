@@ -85,22 +85,30 @@ func ErrFromUpstream(err error) *ToolError {
 
 func errFromUpstream(err error) *ToolError {
 	switch {
-	case errors.Is(err, context.DeadlineExceeded):
-		return &ToolError{Code: CodeUpstreamTimeout, Message: "browser fetch exceeded deadline"}
+	case errors.Is(err, context.DeadlineExceeded), errors.Is(err, context.Canceled):
+		return &ToolError{Code: CodeUpstreamTimeout, Message: "request timed out waiting for DSV"}
 	case errors.Is(err, domain.ErrShipmentNotFound),
 		errors.Is(err, domain.ErrInvalidReference):
 		return &ToolError{Code: CodeShipmentNotFound, Message: "no shipment found for that reference"}
 	case errors.Is(err, domain.ErrUpstreamUnavailable):
 		return &ToolError{
 			Code:    CodeUpstreamUnavailable,
-			Message: "DSV is unreachable",
-			Details: map[string]any{"upstream_message": err.Error()},
+			Message: "DSV is unreachable — try again in a few seconds",
 		}
 	case errors.Is(err, domain.ErrThrottled):
 		return &ToolError{
 			Code:    CodeUpstreamUnavailable,
-			Message: "DSV throttled the request",
-			Details: map[string]any{"upstream_message": err.Error()},
+			Message: "DSV is rate-limiting requests — try again shortly",
+		}
+	case errors.Is(err, domain.ErrMalformedResponse):
+		return &ToolError{
+			Code:    CodeUpstreamError,
+			Message: "DSV returned an unrecognised response format",
+		}
+	case errors.Is(err, domain.ErrUnsupportedTransportMode):
+		return &ToolError{
+			Code:    CodeUpstreamError,
+			Message: "shipment uses a transport mode not yet supported (SEA/AIR/RAIL)",
 		}
 	default:
 		return &ToolError{

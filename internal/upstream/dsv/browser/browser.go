@@ -229,7 +229,7 @@ func (b *Browser) FetchJSON(ctx context.Context, pageURL, xhrSubstring string) (
 		return nil, &domain.UpstreamError{Op: "browser_fetch", Err: domain.ErrUpstreamUnavailable}
 
 	case <-ctx.Done():
-		return nil, ctx.Err()
+		return nil, &domain.UpstreamError{Op: "browser_fetch", Err: domain.ErrUpstreamUnavailable}
 	}
 }
 

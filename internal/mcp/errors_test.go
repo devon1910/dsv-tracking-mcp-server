@@ -43,10 +43,9 @@ func TestToolError_Constructors(t *testing.T) {
 			wantCode:        mcpinternal.CodeShipmentNotFound,
 		},
 		{
-			name:            "upstream ErrUpstreamUnavailable",
-			err:             &domain.UpstreamError{Op: "detail", Err: domain.ErrUpstreamUnavailable},
-			wantCode:        mcpinternal.CodeUpstreamUnavailable,
-			wantDetailKey:   "upstream_message",
+			name:     "upstream ErrUpstreamUnavailable",
+			err:      &domain.UpstreamError{Op: "detail", Err: domain.ErrUpstreamUnavailable},
+			wantCode: mcpinternal.CodeUpstreamUnavailable,
 		},
 		{
 			name:            "upstream ErrThrottled",
