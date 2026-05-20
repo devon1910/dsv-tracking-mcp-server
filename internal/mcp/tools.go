@@ -3,6 +3,7 @@ package mcp
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log/slog"
 	"strings"
 	"time"
@@ -176,11 +177,26 @@ func (h *toolHandlers) getShipmentDetails(
 			searchResp, searchErr := h.deps.SearchCache.Fetch(ctx, cacheKey, func(ctx context.Context) ([]domain.ShipmentSummary, error) {
 				return h.deps.Upstream.Search(ctx, stt)
 			})
-			if searchErr == nil && len(searchResp.Data) == 0 {
-				h.record("get_shipment_details", "not_found", start)
-				return nil, getShipmentDetailsOutput{}, &ToolError{
-					Code:    CodeShipmentNotFound,
-					Message: "no shipment found — the shipment_id may contain a typo",
+			if searchErr == nil {
+				if len(searchResp.Data) == 0 {
+					// STT doesn't exist at all.
+					h.record("get_shipment_details", "not_found", start)
+					return nil, getShipmentDetailsOutput{}, &ToolError{
+						Code:    CodeShipmentNotFound,
+						Message: "no shipment found — the shipment_id may contain a typo",
+					}
+				}
+				// STT exists but check whether the full composite ID matches.
+				// A mismatch means the typo is in a segment other than the STT
+				// (e.g. wrong mode suffix like "LANDer" instead of "LAND").
+				correctID := searchResp.Data[0].ShipmentID
+				if correctID != sid {
+					h.record("get_shipment_details", "not_found", start)
+					return nil, getShipmentDetailsOutput{}, &ToolError{
+						Code:    CodeShipmentNotFound,
+						Message: fmt.Sprintf("shipment_id looks like a typo — did you mean %q?", correctID),
+						Details: map[string]any{"correct_shipment_id": correctID},
+					}
 				}
 			}
 		}
