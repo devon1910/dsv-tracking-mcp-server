@@ -1,5 +1,5 @@
-BINARY  := bin/dsv-tracking-mcp-server
-CMD     := ./cmd/server
+BINARY  := bin/dsv-tracking-mcp
+CMD     := ./cmd/dsv-tracking-mcp
 
 .PHONY: build test test-integration lint run clean
 
