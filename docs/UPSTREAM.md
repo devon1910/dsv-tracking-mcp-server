@@ -313,14 +313,14 @@ Three tools are registered by the server (Phase 4). Each returns a freshness tag
 ### `track_shipment`
 - **Input**: `reference` (string, required); `reference_type` (string, optional — one of the 21 codes from `list_reference_types`)
 - **Output**: `{ shipments: [ShipmentSummaryView], freshness, retrieved_at }`
-- **Error codes**: `INVALID_INPUT`, `INVALID_REFERENCE_TYPE`, `UPSTREAM_ERROR`
+- **Error codes**: `INVALID_INPUT`, `INVALID_REFERENCE_TYPE`, `SHIPMENT_NOT_FOUND`, `UPSTREAM_TIMEOUT`, `UPSTREAM_UNAVAILABLE`
 - **Cache**: search cache, key = `lower(reference)|reference_type`, TTL 60 s
 
 ### `get_shipment_details`
 - **Input**: `shipment_id` (string, required — composite form `Provider:Ref:DataProvider:Mode`)
 - **Output**: `{ shipment: ShipmentDetailView, freshness, retrieved_at }`
-- **Error codes**: `INVALID_SHIPMENT_ID`, `SHIPMENT_NOT_FOUND`, `UPSTREAM_ERROR`
-- **Cache**: detail cache, key = `shipment_id`, TTL 30 s
+- **Error codes**: `INVALID_SHIPMENT_ID`, `SHIPMENT_NOT_FOUND`, `UPSTREAM_TIMEOUT`, `UPSTREAM_UNAVAILABLE`
+- **Cache**: detail cache, key = `shipment_id`, TTL 30 s (Delivered shipments extended to 24 h)
 
 ### `list_reference_types`
 - **Input**: none
