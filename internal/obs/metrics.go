@@ -14,10 +14,6 @@ type Metrics struct {
 	ToolCalls   *prometheus.CounterVec
 	ToolLatency *prometheus.HistogramVec
 
-	// DSV upstream request metrics.
-	DSVRequests *prometheus.CounterVec   // labels: endpoint, status
-	DSVLatency  *prometheus.HistogramVec // labels: endpoint
-
 	// DSV browser-backed fetch metrics.
 	DSVBrowserFetches *prometheus.CounterVec   // labels: endpoint, status
 	DSVBrowserLatency *prometheus.HistogramVec // labels: endpoint
@@ -39,15 +35,6 @@ func NewMetrics() *Metrics {
 			Help:    "Latency of MCP tool calls in seconds.",
 			Buckets: prometheus.DefBuckets,
 		}, []string{"tool"}),
-		DSVRequests: prometheus.NewCounterVec(prometheus.CounterOpts{
-			Name: "dsv_upstream_requests_total",
-			Help: "Total DSV upstream HTTP requests partitioned by endpoint and HTTP status class.",
-		}, []string{"endpoint", "status"}),
-		DSVLatency: prometheus.NewHistogramVec(prometheus.HistogramOpts{
-			Name:    "dsv_upstream_latency_seconds",
-			Help:    "Latency of DSV upstream HTTP requests in seconds.",
-			Buckets: prometheus.DefBuckets,
-		}, []string{"endpoint"}),
 		DSVBrowserFetches: prometheus.NewCounterVec(prometheus.CounterOpts{
 			Name: "dsv_browser_fetches_total",
 			Help: "Total DSV browser-backed fetches partitioned by endpoint and status.",
@@ -58,7 +45,7 @@ func NewMetrics() *Metrics {
 			Buckets: prometheus.DefBuckets,
 		}, []string{"endpoint"}),
 	}
-	reg.MustRegister(m.ToolCalls, m.ToolLatency, m.DSVRequests, m.DSVLatency, m.DSVBrowserFetches, m.DSVBrowserLatency)
+	reg.MustRegister(m.ToolCalls, m.ToolLatency, m.DSVBrowserFetches, m.DSVBrowserLatency)
 	return m
 }
 
