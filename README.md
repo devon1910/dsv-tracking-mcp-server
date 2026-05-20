@@ -105,7 +105,7 @@ Restart Claude Desktop. Ask: *"Where is waybill 3476472018?"*
 npx @modelcontextprotocol/inspector ./bin/dsv-tracking-mcp
 ```
 
-Opens a UI at `http://localhost:5173` where you can call each tool and see the raw JSON response.
+Opens a browser UI — the exact port is printed in the terminal when it starts. Call each tool and see the raw JSON response.
 
 ### Custom code (Go)
 
