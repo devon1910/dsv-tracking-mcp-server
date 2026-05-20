@@ -131,8 +131,9 @@ func (h *toolHandlers) trackShipment(
 		return h.deps.Upstream.Search(ctx, ref)
 	})
 	if err != nil {
-		h.record("track_shipment", "upstream_error", start)
-		return nil, trackShipmentOutput{}, errFromUpstream(err)
+		te := errFromUpstream(err)
+		h.record("track_shipment", string(te.Code), start)
+		return nil, trackShipmentOutput{}, te
 	}
 
 	views := make([]domain.ShipmentSummaryView, len(resp.Data))

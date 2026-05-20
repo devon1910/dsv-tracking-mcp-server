@@ -31,16 +31,20 @@ func assertToolErrCode(t *testing.T, err error, want mcpinternal.ErrorCode) {
 
 func TestToolError_Constructors(t *testing.T) {
 	cases := []struct {
-		name    string
-		err     error
-		wantCode mcpinternal.ErrorCode
-		wantMsgContains string
-		wantDetailKey   string
+		name          string
+		err           error
+		wantCode      mcpinternal.ErrorCode
+		wantDetailKey string
 	}{
 		{
-			name:            "upstream ErrShipmentNotFound",
-			err:             &domain.UpstreamError{Op: "detail", Err: domain.ErrShipmentNotFound},
-			wantCode:        mcpinternal.CodeShipmentNotFound,
+			name:     "upstream ErrShipmentNotFound",
+			err:      &domain.UpstreamError{Op: "detail", Err: domain.ErrShipmentNotFound},
+			wantCode: mcpinternal.CodeShipmentNotFound,
+		},
+		{
+			name:     "upstream ErrInvalidReference",
+			err:      &domain.UpstreamError{Op: "search", Err: domain.ErrInvalidReference},
+			wantCode: mcpinternal.CodeShipmentNotFound,
 		},
 		{
 			name:     "upstream ErrUpstreamUnavailable",
@@ -48,20 +52,35 @@ func TestToolError_Constructors(t *testing.T) {
 			wantCode: mcpinternal.CodeUpstreamUnavailable,
 		},
 		{
-			name:            "upstream ErrThrottled",
-			err:             &domain.UpstreamError{Op: "detail", Err: domain.ErrThrottled},
-			wantCode:        mcpinternal.CodeUpstreamUnavailable,
+			name:     "upstream ErrThrottled",
+			err:      &domain.UpstreamError{Op: "detail", Err: domain.ErrThrottled},
+			wantCode: mcpinternal.CodeUpstreamUnavailable,
 		},
 		{
-			name:            "context deadline exceeded",
-			err:             context.DeadlineExceeded,
-			wantCode:        mcpinternal.CodeUpstreamTimeout,
+			name:     "upstream ErrMalformedResponse",
+			err:      &domain.UpstreamError{Op: "detail", Err: domain.ErrMalformedResponse},
+			wantCode: mcpinternal.CodeUpstreamError,
 		},
 		{
-			name:            "unknown upstream error",
-			err:             errors.New("something weird"),
-			wantCode:        mcpinternal.CodeUpstreamError,
-			wantDetailKey:   "upstream_message",
+			name:     "upstream ErrUnsupportedTransportMode",
+			err:      &domain.UpstreamError{Op: "detail", Err: domain.ErrUnsupportedTransportMode},
+			wantCode: mcpinternal.CodeUpstreamError,
+		},
+		{
+			name:     "context deadline exceeded",
+			err:      context.DeadlineExceeded,
+			wantCode: mcpinternal.CodeUpstreamTimeout,
+		},
+		{
+			name:     "context canceled",
+			err:      context.Canceled,
+			wantCode: mcpinternal.CodeUpstreamTimeout,
+		},
+		{
+			name:          "unknown upstream error",
+			err:           errors.New("something weird"),
+			wantCode:      mcpinternal.CodeUpstreamError,
+			wantDetailKey: "upstream_message",
 		},
 	}
 
@@ -71,7 +90,7 @@ func TestToolError_Constructors(t *testing.T) {
 			if te.Code != tc.wantCode {
 				t.Errorf("Code = %q, want %q", te.Code, tc.wantCode)
 			}
-			if tc.wantDetailKey != "" && tc.err != context.DeadlineExceeded {
+			if tc.wantDetailKey != "" {
 				if te.Details == nil {
 					t.Errorf("Details is nil, want key %q", tc.wantDetailKey)
 				} else if _, ok := te.Details[tc.wantDetailKey]; !ok {

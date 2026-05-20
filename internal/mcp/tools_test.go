@@ -31,6 +31,10 @@ type fakeUpstream struct {
 	detailResult domain.Shipment
 	detailErr    error
 	detailCalls  int
+
+	// searchErrOnce makes searchErr fire only on the first call; subsequent
+	// calls return searchResult. Useful for simulating a retry succeeding.
+	searchErrOnce bool
 }
 
 func (f *fakeUpstream) Search(_ context.Context, _ string) ([]domain.ShipmentSummary, error) {
@@ -275,6 +279,74 @@ func TestGetShipmentDetails_NotFound(t *testing.T) {
 		t.Fatal("expected error for not-found shipment")
 	}
 	assertErrCode(t, firstText(result), "SHIPMENT_NOT_FOUND")
+}
+
+// TestGetShipmentDetails_TimeoutWithUnknownSTT verifies that when the detail
+// call times out AND the post-timeout search confirms the STT doesn't exist,
+// the response is SHIPMENT_NOT_FOUND rather than UPSTREAM_UNAVAILABLE.
+func TestGetShipmentDetails_TimeoutWithUnknownSTT(t *testing.T) {
+	up := &fakeUpstream{
+		detailErr: &domain.UpstreamError{Err: domain.ErrUpstreamUnavailable},
+		searchErr: &domain.UpstreamError{Err: domain.ErrShipmentNotFound}, // STT doesn't exist
+	}
+	s := mcpinternal.New(noopLogger(), obs.NewMetrics())
+	mcpinternal.RegisterAll(s, newDeps(up))
+
+	result := callTool(t, s, "get_shipment_details", map[string]any{
+		"shipment_id": "LandStt:BADSTTT:CTTS:LAND",
+	})
+	if !result.IsError {
+		t.Fatal("expected error")
+	}
+	assertErrCode(t, firstText(result), "SHIPMENT_NOT_FOUND")
+}
+
+// TestGetShipmentDetails_TimeoutWithIDMismatch verifies that when the detail
+// times out but the STT resolves to a DIFFERENT composite ID (typo in a non-STT
+// segment), we return SHIPMENT_NOT_FOUND with the correct ID in details.
+func TestGetShipmentDetails_TimeoutWithIDMismatch(t *testing.T) {
+	up := &fakeUpstream{
+		detailErr:    &domain.UpstreamError{Err: domain.ErrUpstreamUnavailable},
+		searchResult: []domain.ShipmentSummary{{ShipmentID: "LandStt:GOODSTT:CTTS:LAND"}},
+	}
+	s := mcpinternal.New(noopLogger(), obs.NewMetrics())
+	mcpinternal.RegisterAll(s, newDeps(up))
+
+	result := callTool(t, s, "get_shipment_details", map[string]any{
+		"shipment_id": "LandStt:GOODSTT:CTTS:LANDer", // typo in last segment
+	})
+	if !result.IsError {
+		t.Fatal("expected error")
+	}
+	assertErrCode(t, firstText(result), "SHIPMENT_NOT_FOUND")
+	var m map[string]any
+	if err := json.Unmarshal([]byte(firstText(result)), &m); err != nil {
+		t.Fatal(err)
+	}
+	details, _ := m["details"].(map[string]any)
+	if details["correct_shipment_id"] != "LandStt:GOODSTT:CTTS:LAND" {
+		t.Errorf("correct_shipment_id = %v, want LandStt:GOODSTT:CTTS:LAND", details["correct_shipment_id"])
+	}
+}
+
+// TestGetShipmentDetails_TimeoutGenuinelyUnavailable verifies that when the
+// detail times out AND the search also fails (DSV truly down), we surface
+// UPSTREAM_UNAVAILABLE rather than a misleading SHIPMENT_NOT_FOUND.
+func TestGetShipmentDetails_TimeoutGenuinelyUnavailable(t *testing.T) {
+	up := &fakeUpstream{
+		detailErr: &domain.UpstreamError{Err: domain.ErrUpstreamUnavailable},
+		searchErr: &domain.UpstreamError{Err: domain.ErrUpstreamUnavailable},
+	}
+	s := mcpinternal.New(noopLogger(), obs.NewMetrics())
+	mcpinternal.RegisterAll(s, newDeps(up))
+
+	result := callTool(t, s, "get_shipment_details", map[string]any{
+		"shipment_id": "LandStt:GOODSTT:CTTS:LAND",
+	})
+	if !result.IsError {
+		t.Fatal("expected error")
+	}
+	assertErrCode(t, firstText(result), "UPSTREAM_UNAVAILABLE")
 }
 
 func TestGetShipmentDetails_MalformedID(t *testing.T) {

@@ -229,10 +229,10 @@ func (b *Browser) FetchJSON(ctx context.Context, pageURL, xhrSubstring string) (
 		return nil, &domain.UpstreamError{Op: "browser_fetch", Err: domain.ErrUpstreamUnavailable}
 
 	case <-ctx.Done():
+		b.recordMetrics(xhrSubstring, "cancelled", time.Since(start))
 		return nil, &domain.UpstreamError{Op: "browser_fetch", Err: domain.ErrUpstreamUnavailable}
 	}
 }
-
 
 // Close shuts down the browser process and releases all associated resources.
 func (b *Browser) Close() error {
