@@ -159,6 +159,22 @@ func (h *toolHandlers) getShipmentDetails(
 		return nil, getShipmentDetailsOutput{}, errInvalidShipmentID(sid)
 	}
 
+	// Pre-flight search: mirrors DSV's own frontend which calls the search
+	// endpoint before the detail endpoint on every page load. If search returns
+	// nothing, the detail XHR will never fire and we'd time out — fail fast here
+	// instead. A prior track_shipment call makes this a cache hit at zero cost.
+	stt := strings.Split(sid, ":")[1]
+	searchResp, searchErr := h.deps.SearchCache.Fetch(ctx, strings.ToLower(stt)+"|", func(ctx context.Context) ([]domain.ShipmentSummary, error) {
+		return h.deps.Upstream.Search(ctx, stt)
+	})
+	if searchErr != nil || len(searchResp.Data) == 0 {
+		h.record("get_shipment_details", "not_found", start)
+		return nil, getShipmentDetailsOutput{}, &ToolError{
+			Code:    CodeShipmentNotFound,
+			Message: "no shipment found for that reference",
+		}
+	}
+
 	resp, err := h.deps.DetailCache.Fetch(ctx, sid, func(ctx context.Context) (domain.Shipment, error) {
 		return h.deps.Upstream.Detail(ctx, sid)
 	})
