@@ -233,6 +233,150 @@ func (b *Browser) FetchJSON(ctx context.Context, pageURL, xhrSubstring string) (
 	}
 }
 
+// FetchDetailJSON navigates once and watches both the search XHR and the detail
+// XHR — mirroring DSV's own frontend which fires them in sequence on the same
+// page load. If the search XHR returns 4xx the detail XHR will never fire;
+// FetchDetailJSON short-circuits with ErrShipmentNotFound rather than waiting
+// for the XHR timeout. If both fire successfully it returns the detail body.
+//
+// searchSubstring must match the search XHR URL; detailSubstring must match
+// the detail XHR URL. Both are expected to fire during a single navigation.
+func (b *Browser) FetchDetailJSON(ctx context.Context, pageURL, searchSubstring, detailSubstring string) ([]byte, error) {
+	start := time.Now()
+
+	tabCtx, tabCancel := chromedp.NewContext(b.browserCtx)
+	defer tabCancel()
+
+	type xhrResult struct {
+		body   []byte
+		status int
+		isDetail bool // false = search pre-check, true = detail response
+	}
+	resCh := make(chan xhrResult, 2)
+
+	var (
+		mu              sync.Mutex
+		searchReqID     network.RequestID
+		searchStatus    int
+		detailReqID     network.RequestID
+		detailStatus    int
+	)
+
+	chromedp.ListenTarget(tabCtx, func(ev interface{}) {
+		switch e := ev.(type) {
+		case *network.EventResponseReceived:
+			if e.Type != network.ResourceTypeXHR && e.Type != network.ResourceTypeFetch {
+				return
+			}
+			url := e.Response.URL
+			mu.Lock()
+			if strings.Contains(url, searchSubstring) && searchReqID == "" {
+				searchReqID = e.RequestID
+				searchStatus = int(e.Response.Status)
+			} else if strings.Contains(url, detailSubstring) && detailReqID == "" {
+				detailReqID = e.RequestID
+				detailStatus = int(e.Response.Status)
+			}
+			mu.Unlock()
+
+		case *network.EventLoadingFinished:
+			mu.Lock()
+			sID, sStatus := searchReqID, searchStatus
+			dID, dStatus := detailReqID, detailStatus
+			mu.Unlock()
+
+			chromedpCtx := chromedp.FromContext(tabCtx)
+			if chromedpCtx == nil || chromedpCtx.Target == nil {
+				return
+			}
+			executor := cdp.WithExecutor(context.Background(), chromedpCtx.Target)
+
+			switch e.RequestID {
+			case sID:
+				if sID == "" {
+					return
+				}
+				go func(rID network.RequestID, status int) {
+					body, err := network.GetResponseBody(rID).Do(executor)
+					if err != nil {
+						return
+					}
+					select {
+					case resCh <- xhrResult{body: body, status: status, isDetail: false}:
+					default:
+					}
+				}(sID, sStatus)
+
+			case dID:
+				if dID == "" {
+					return
+				}
+				go func(rID network.RequestID, status int) {
+					body, err := network.GetResponseBody(rID).Do(executor)
+					if err != nil {
+						return
+					}
+					if len(body) == 0 {
+						return
+					}
+					select {
+					case resCh <- xhrResult{body: body, status: status, isDetail: true}:
+					default:
+					}
+				}(dID, dStatus)
+			}
+		}
+	})
+
+	navCtx, navCancel := context.WithTimeout(tabCtx, b.navTO)
+	defer navCancel()
+
+	if err := chromedp.Run(navCtx,
+		network.Enable().
+			WithMaxTotalBufferSize(4*1024*1024).
+			WithMaxResourceBufferSize(1*1024*1024),
+		chromedp.Navigate(pageURL),
+	); err != nil && navCtx.Err() == nil {
+		b.recordMetrics(detailSubstring, "nav_err", time.Since(start))
+		return nil, &domain.UpstreamError{Op: "browser_nav", Err: domain.ErrUpstreamUnavailable}
+	}
+
+	xhrTimer := time.NewTimer(b.xhrTO)
+	defer xhrTimer.Stop()
+
+	// Collect results. We may receive search before detail; we need both
+	// (search to validate, detail for the body). Short-circuit if search is 4xx.
+	searchOK := false
+	for {
+		select {
+		case r := <-resCh:
+			if !r.isDetail {
+				// Search XHR received.
+				if r.status >= 400 {
+					b.recordMetrics(searchSubstring, fmt.Sprintf("%d", r.status), time.Since(start))
+					return nil, mapErrorResponse(r.status, r.body)
+				}
+				searchOK = true
+			} else {
+				// Detail XHR received.
+				b.recordMetrics(detailSubstring, fmt.Sprintf("%d", r.status), time.Since(start))
+				if r.status >= 400 {
+					return nil, mapErrorResponse(r.status, r.body)
+				}
+				return r.body, nil
+			}
+			_ = searchOK // used implicitly: if search was 4xx we already returned
+
+		case <-xhrTimer.C:
+			b.recordMetrics(detailSubstring, "timeout", time.Since(start))
+			return nil, &domain.UpstreamError{Op: "browser_fetch", Err: domain.ErrUpstreamUnavailable}
+
+		case <-ctx.Done():
+			return nil, &domain.UpstreamError{Op: "browser_fetch", Err: domain.ErrUpstreamUnavailable}
+		}
+	}
+}
+
 // Close shuts down the browser process and releases all associated resources.
 func (b *Browser) Close() error {
 	b.browserCancel()

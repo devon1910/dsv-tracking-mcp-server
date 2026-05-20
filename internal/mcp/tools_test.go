@@ -225,10 +225,7 @@ func TestTrackShipment_UpstreamEmptyResult(t *testing.T) {
 
 func TestGetShipmentDetails_HappyPath(t *testing.T) {
 	shipment := loadDetailFixture(t, "delivered_ltl_se_fr.json")
-	up := &fakeUpstream{
-		searchResult: []domain.ShipmentSummary{{ShipmentID: "LandStt:VAN5022058:CTTS:LAND"}},
-		detailResult: shipment,
-	}
+	up := &fakeUpstream{detailResult: shipment}
 	s := mcpinternal.New(noopLogger(), obs.NewMetrics())
 	mcpinternal.RegisterAll(s, newDeps(up))
 
@@ -301,11 +298,9 @@ func TestGetShipmentDetails_StaleFallback(t *testing.T) {
 	// Use an in-transit fixture: a DELIVERED shipment would get a 24 h TTL
 	// from the conditional-TTL logic and would never appear stale in this test.
 	shipment := loadDetailFixture(t, "dispatching_parcel_se_se.json")
-	searchHit := []domain.ShipmentSummary{{ShipmentID: "LandStt:SEKSD620143489:CTTS:LAND"}}
-
 	// Short TTL to force expiry quickly.
 	shortDeps := mcpinternal.ToolDeps{
-		Upstream:    &fakeUpstream{searchResult: searchHit, detailResult: shipment},
+		Upstream:    &fakeUpstream{detailResult: shipment},
 		SearchCache: cache.New[[]domain.ShipmentSummary](cache.Config{TTL: time.Minute}, noopLogger()),
 		DetailCache: cache.New[domain.Shipment](cache.Config{TTL: 20 * time.Millisecond, StaleWindow: time.Minute}, noopLogger()),
 		Logger:      noopLogger(),
@@ -322,8 +317,8 @@ func TestGetShipmentDetails_StaleFallback(t *testing.T) {
 	// Let it expire.
 	time.Sleep(40 * time.Millisecond)
 
-	// Replace upstream with one that fails on detail but still returns search hit.
-	shortDeps.Upstream = &fakeUpstream{searchResult: searchHit, detailErr: errors.New("upstream down")}
+	// Replace upstream with one that fails on detail.
+	shortDeps.Upstream = &fakeUpstream{detailErr: errors.New("upstream down")}
 	s2 := mcpinternal.New(noopLogger(), obs.NewMetrics())
 	mcpinternal.RegisterAll(s2, shortDeps)
 
@@ -343,10 +338,7 @@ func TestGetShipmentDetails_StaleFallback(t *testing.T) {
 // returns a cached result (24 h TTL was applied).
 func TestConditionalTTL_DeliveredShipmentGets24hTTL(t *testing.T) {
 	shipment := loadDetailFixture(t, "delivered_ltl_se_fr.json") // DELIVERED
-	up := &fakeUpstream{
-		searchResult: []domain.ShipmentSummary{{ShipmentID: "LandStt:VAN5022058:CTTS:LAND"}},
-		detailResult: shipment,
-	}
+	up := &fakeUpstream{detailResult: shipment}
 
 	// Use a very short default TTL; the conditional 24 h TTL must override it.
 	const defaultTTL = 15 * time.Millisecond
